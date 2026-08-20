@@ -16,7 +16,9 @@ Open http://localhost:3000
 
 - `/`            Landing page (server-rendered, SEO)
 - `/apply`       60-second screening -> tiers/packages -> Zelle checkout -> client portal
-- `/bruen`       Article page (SEO surface)
+- `/your-rights` Article page (SEO surface; `/bruen` redirects here)
+- `/reviews`     Testimonials and success stories (placeholder content until launch)
+- `/attorney`    Attorney bio page
 - `/faq`         FAQ with schema.org markup (Google rich results)
 - `/privacy`     Privacy policy
 - `app/api/lead`    stores leads, emails you instantly

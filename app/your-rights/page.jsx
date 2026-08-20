@@ -3,17 +3,17 @@ import { Nav, Footer, Eyebrow } from "@/lib/ui";
 import { BRUEN } from "@/lib/content";
 
 export const metadata = {
-  title: "The Bruen Decision and NYC Carry Licenses | Clear to Carry",
+  title: "Your Right to Carry in NYC | Clear to Carry",
   description:
-    "How NYSRPA v. Bruen ended 'proper cause,' what the Concealed Carry Improvement Act changed, and why non-residents can now apply for a NYC carry license.",
+    "The Supreme Court ended 'proper cause.' What that means for your right to a NYC firearm license, and why non-residents can now apply too.",
 };
 
-export default function BruenPage() {
+export default function YourRightsPage() {
   return (
     <div>
       <Nav />
       <div className="v-page v-mid">
-        <Eyebrow>Insights</Eyebrow>
+        <Eyebrow>Your rights</Eyebrow>
         <h1 className="v-h1 v-h1sm">{BRUEN.title}</h1>
         <div className="v-artmeta">{BRUEN.date} · {BRUEN.read} · Zayrov Law, P.C.</div>
         <div className="v-article">

@@ -547,6 +547,14 @@ body :focus-visible { outline: 1.5px solid #C9A96A; outline-offset: 3px; }
 .v-finalcta { max-width: 960px; margin: 0 auto; padding: 72px 22px 90px; text-align: center; }
 .v-goldem { font-style: italic; color: #C9A96A; }
 
+/* attorney credentials */
+.v-creds { display: flex; flex-wrap: wrap; gap: 10px; margin: 6px 0 26px; }
+.v-cred {
+  font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.16em;
+  text-transform: uppercase; color: #C9A96A; border: 1px solid #8C7443;
+  padding: 7px 12px;
+}
+
 @media (min-width: 720px) {
   .v-bandin { grid-template-columns: repeat(3, 1fr); }
   .v-licensegrid { grid-template-columns: repeat(3, 1fr); }

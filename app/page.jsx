@@ -1,35 +1,5 @@
 import Link from "next/link";
-import { Nav, Footer, Skyline } from "@/lib/ui";
-
-function HomeIcon() {
-  return (
-    <svg className="v-cardicon" viewBox="0 0 64 64" aria-hidden="true">
-      <path d="M8 30 L32 10 L56 30" fill="none" stroke="#C9A96A" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M14 27 V54 H50 V27" fill="none" stroke="#C9A96A" strokeWidth="2.5" strokeLinecap="round" />
-      <path d="M26 54 V38 H38 V54" fill="none" stroke="#8C7443" strokeWidth="2.5" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-function StoreIcon() {
-  return (
-    <svg className="v-cardicon" viewBox="0 0 64 64" aria-hidden="true">
-      <path d="M10 22 L14 10 H50 L54 22" fill="none" stroke="#C9A96A" strokeWidth="2.5" strokeLinejoin="round" />
-      <path d="M10 22 H54 V30 C54 33 51 36 47 36 C43 36 40 33 40 30 C40 33 37 36 32 36 C27 36 24 33 24 30 C24 33 21 36 17 36 C13 36 10 33 10 30 Z" fill="rgba(201,169,106,0.08)" stroke="#C9A96A" strokeWidth="2.5" strokeLinejoin="round" />
-      <path d="M14 36 V54 H50 V36" fill="none" stroke="#C9A96A" strokeWidth="2.5" strokeLinecap="round" />
-      <path d="M38 54 V42 H46 V54" fill="none" stroke="#8C7443" strokeWidth="2.5" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-function StarShieldIcon() {
-  return (
-    <svg className="v-cardicon" viewBox="0 0 64 64" aria-hidden="true">
-      <path d="M32 4 L56 13 V32 C56 47 46 57 32 62 C18 57 8 47 8 32 V13 Z" fill="rgba(201,169,106,0.08)" stroke="#C9A96A" strokeWidth="2.5" strokeLinejoin="round" />
-      <path d="M32 18 L36 28 H47 L38 34 L41 45 L32 38 L23 45 L26 34 L17 28 H28 Z" fill="#C9A96A" />
-    </svg>
-  );
-}
+import { Nav, Footer, Skyline, HomeIcon, StoreIcon, StarShieldIcon } from "@/lib/ui";
 
 export default function Home() {
   return (
