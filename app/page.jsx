@@ -1,14 +1,22 @@
+import fs from "fs";
+import path from "path";
 import Link from "next/link";
 import { Nav, Footer, Skyline, Liberty, Wordmark, LicenseIcon } from "@/lib/ui";
 import { PACKAGES } from "@/lib/content";
+
+/* A real photograph, when one has been supplied, replaces the drawn skyline
+   and Liberty rather than stacking on top of them. Drop a file at
+   public/hero-nyc.jpg and the hero switches over; remove it and the
+   illustration comes back. See README "Hero photograph". */
+const heroPhoto = fs.existsSync(path.join(process.cwd(), "public", "hero-nyc.jpg"));
 
 export default function Home() {
   return (
     <div>
       <Nav />
 
-      <section className="v-hero">
-        <div className="v-herophoto" aria-hidden="true" />
+      <section className={"v-hero" + (heroPhoto ? " v-heroshot" : "")}>
+        {heroPhoto && <div className="v-herophoto" aria-hidden="true" />}
         <div className="v-heroscrim" aria-hidden="true" />
         <div className="v-heroinner">
           <Wordmark size={1} />
@@ -25,8 +33,8 @@ export default function Home() {
             <Link className="v-quiet" href="/apply?view=packages">Engagements</Link>
           </div>
         </div>
-        <Liberty className="v-liberty" />
-        <Skyline />
+        {!heroPhoto && <Liberty className="v-liberty" />}
+        {!heroPhoto && <Skyline />}
       </section>
 
       <section className="v-amend">

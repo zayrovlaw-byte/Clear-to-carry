@@ -733,3 +733,20 @@ body :focus-visible { outline: 1.5px solid #C9A96A; outline-offset: 3px; }
 @media (min-width: 720px) {
   .v-resultsgrid { grid-template-columns: repeat(3, 1fr); }
 }
+
+/* With a photograph in place the hero carries its own horizon, so it needs
+   real height and a soft landing into the page below. */
+.v-heroshot { min-height: min(76vh, 660px); display: flex; align-items: center; }
+.v-heroshot .v-heroinner { padding-top: 64px; padding-bottom: 64px; width: 100%; }
+.v-heroshot .v-heroglow { display: none; }
+
+/* Narrow screens crop hard to centre, which lands on the figure and loses the
+   city. Pull the focal point left, onto the skyline. */
+@media (max-width: 720px) {
+  .v-herophoto { background-position: 21% 42%; }
+  .v-heroshot { min-height: min(72vh, 560px); }
+  .v-navin { gap: 10px; }
+  .v-navright { gap: 12px !important; }
+  .v-navlink { font-size: 10.5px; letter-spacing: 0.06em; }
+  .b-navwords { font-size: 13px; letter-spacing: 0.1em; }
+}
