@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Eyebrow } from "@/lib/ui";
+import { Eyebrow, LicenseIcon } from "@/lib/ui";
 import { PACKAGES, TIERS, QUALIFY, PHASES, THIRD_PARTY_COSTS, FEE_RANGE, ZELLE_TO, PHONE, PHONE_TEL } from "@/lib/content";
 
 const GREEN = "#5FA97F", RED = "#C25450", CHAMPAGNE = "#C9A96A";
@@ -145,17 +145,19 @@ function Qualify({ go }) {
   );
 }
 
-/* ---------------- packages ---------------- */
-function Packages({ go, choose }) {
+/* ---------------- packages ----------------
+   Deliberately price-free. The fee is disclosed on the Fee step, one click
+   from checkout, so the visitor chooses the engagement on its merits first. */
+function Packages({ go, choose, pickLicense }) {
   const [showLicenses, setShowLicenses] = useState(false);
   return (
     <div className="v-page">
       <Eyebrow>Engagements</Eyebrow>
       <h1 className="v-h1 v-h1sm">Choose how much of this you want to carry.</h1>
       <p className="v-lede v-ledesm">
-        Every level is flat fee and handled personally by the attorney. Most clients
-        choose Full Representation. Some want an hour of straight answers first.
-        Both are the right way in.
+        Every level is a flat fee, fixed in writing, and handled personally by the
+        attorney. Most clients choose Full Representation. Some want an hour of
+        straight answers first. Both are the right way in.
       </p>
       <div className="v-tiers">
         {TIERS.map((t) => (
@@ -163,15 +165,16 @@ function Packages({ go, choose }) {
             {t.featured && <div className="v-featribbon">Most engaged</div>}
             <div className="v-packtier">{t.tier}</div>
             <div className="v-packname">{t.name}</div>
-            <div className="v-packprice">{t.priceLabel || fmt(t.price)}</div>
             <p className="v-packline">{t.line}</p>
             <p className="v-packfor">{t.for}</p>
             {t.checkout && (
-              <button className="v-quiet v-w100" onClick={() => choose({ id: t.id, name: t.name, price: t.price })}>Begin</button>
+              <button className="v-quiet v-w100" onClick={() => choose({ id: t.id, name: t.name, price: t.price })}>
+                Continue
+              </button>
             )}
             {t.expands && (
-              <button className="v-gold v-w100" onClick={() => setShowLicenses((s) => !s)}>
-                {showLicenses ? "Hide license types" : "Select your license type"}
+              <button className="v-gold v-w100" onClick={() => setShowLicenses((v) => !v)}>
+                {showLicenses ? "Hide licence types" : "Choose your licence type"}
               </button>
             )}
             {t.concierge && (
@@ -180,38 +183,69 @@ function Packages({ go, choose }) {
           </div>
         ))}
       </div>
+
       {showLicenses && (
         <div className="v-licenseblock">
-          <div className="v-licensehead"><Eyebrow>Full Representation · {FEE_RANGE} · by license</Eyebrow></div>
+          <div className="v-licensehead"><Eyebrow>Full Representation · choose your licence</Eyebrow></div>
           <p className="v-mutetext" style={{ maxWidth: "62ch" }}>
-            Every license type below is handled for the same flat fee band. What moves
-            the number is your record, not your license. We quote your exact figure at
-            the consultation and fix it in the engagement letter.
+            Every licence below is handled for the same flat fee. What moves the
+            number is your record, not which licence you want.
           </p>
           <div className="v-packs">
             {PACKAGES.map((p) => (
-              <div key={p.id} className={"v-pack" + (p.featured ? " v-packfeat" : "")}>
+              <button key={p.id}
+                className={"v-pack v-packbtn" + (p.featured ? " v-packfeat" : "")}
+                onClick={() => pickLicense(p)}>
                 {p.featured && <div className="v-featribbon">Flagship</div>}
+                <LicenseIcon name={p.icon} />
                 <div className="v-packtier">{p.tier}</div>
                 <div className="v-packname">{p.name}</div>
-                <div className="v-packprice">{FEE_RANGE}</div>
                 <p className="v-packline">{p.line}</p>
                 <p className="v-packfor">{p.for}</p>
-                <button className={p.featured ? "v-gold v-w100" : "v-quiet v-w100"} onClick={() => go("consult")}>Get my exact fee</button>
-              </div>
+                <span className={p.featured ? "v-gold v-w100 v-faux" : "v-quiet v-w100 v-faux"}>Continue</span>
+              </button>
             ))}
           </div>
         </div>
       )}
 
-      <div className="v-costs">
+      <div className="v-underpacks">
+        <p className="v-mutetext">Not certain where to start? The first phone call is free and the answer is honest.</p>
+        <button className="v-quiet" onClick={() => go("consult")}>Request free consultation</button>
+      </div>
+    </div>
+  );
+}
+
+/* ---------------- fee ----------------
+   Where price finally appears: one click from checkout, after the visitor has
+   picked a licence. Shows the band, what moves it, and the third-party costs. */
+function Fee({ lic, go }) {
+  return (
+    <div className="v-page v-mid">
+      <button className="v-back" onClick={() => go("packages")}>← Engagements</button>
+      <Eyebrow>Your engagement · {lic.name}</Eyebrow>
+      <h1 className="v-h1 v-h1sm">What this costs.</h1>
+
+      <div className="v-feebox">
+        <div className="v-feelabel">Full Representation · flat fee</div>
+        <div className="v-feefigure">{FEE_RANGE}</div>
+        <p className="v-feenote">
+          Where you land in that band is set by your record, not by your licence. A
+          clean, straightforward file sits at the bottom. A file that needs real
+          legal work sits higher. We tell you your exact figure at the consultation
+          and fix it in writing in the engagement letter before any work begins.
+        </p>
+      </div>
+
+      <div className="v-costs" style={{ marginTop: 34 }}>
         <Eyebrow>What else this costs</Eyebrow>
         <h2 className="v-h2" style={{ marginBottom: 14 }}>Three fees that are not ours.</h2>
         <p className="v-mutetext" style={{ maxWidth: "62ch", marginBottom: 22 }}>
-          Every applicant pays these, with or without an attorney. They go to the City,
-          the State, and your course provider, never to this firm. Amounts are set by
-          them and change, so we confirm current figures at your consultation rather
-          than advertise a number that may be stale when you read it.
+          Every applicant pays these, with or without an attorney. They go to the
+          City, the State, and your course provider, never to this firm. Amounts are
+          set by them and change, so we confirm current figures at your consultation
+          rather than advertise a number that may be stale when you read it.
         </p>
         <div className="v-costlist">
           {THIRD_PARTY_COSTS.map((c) => (
@@ -230,10 +264,13 @@ function Packages({ go, choose }) {
         </div>
       </div>
 
-      <div className="v-underpacks">
-        <p className="v-mutetext">Not certain where to start? The first phone call is free and the answer is honest.</p>
-        <button className="v-quiet" onClick={() => go("consult")}>Request free consultation</button>
-      </div>
+      <button className="v-gold v-w100 v-mt" onClick={() => go("consult")}>
+        Get my exact fee · free consultation
+      </button>
+      <p className="v-mutetext v-mt">
+        Nothing is owed today. We quote your figure, send the engagement letter, and
+        representation begins when it is signed and payment clears.
+      </p>
     </div>
   );
 }
@@ -592,6 +629,7 @@ export default function Flow() {
   const params = useSearchParams();
   const [view, setView] = useState(params.get("view") || "qualify");
   const [pack, setPack] = useState(null);
+  const [lic, setLic] = useState(null);
   const [clientId, setClientId] = useState(null);
 
   useEffect(() => {
@@ -612,15 +650,19 @@ export default function Flow() {
     window.scrollTo(0, 0);
   };
 
+  const choose = (p) => { setPack(p); setView("checkout"); window.scrollTo(0, 0); };
+  const pickLicense = (p) => { setLic(p); setView("fee"); window.scrollTo(0, 0); };
+
+  const packagesView = <Packages go={go} choose={choose} pickLicense={pickLicense} />;
+
   return (
     <>
       {view === "qualify" && <Qualify go={go} />}
-      {view === "packages" && <Packages go={go} choose={(p) => { setPack(p); setView("checkout"); window.scrollTo(0, 0); }} />}
+      {view === "packages" && packagesView}
+      {view === "fee" && (lic ? <Fee lic={lic} go={go} /> : packagesView)}
       {view === "consult" && <Consult go={go} />}
-      {view === "checkout" && pack && <Checkout pack={pack} go={go} onOpened={openPortal} />}
-      {view === "checkout" && !pack && <Packages go={go} choose={(p) => { setPack(p); setView("checkout"); }} />}
-      {view === "portal" && clientId && <Portal clientId={clientId} go={go} />}
-      {view === "portal" && !clientId && <Packages go={go} choose={(p) => { setPack(p); setView("checkout"); }} />}
+      {view === "checkout" && (pack ? <Checkout pack={pack} go={go} onOpened={openPortal} /> : packagesView)}
+      {view === "portal" && (clientId ? <Portal clientId={clientId} go={go} /> : packagesView)}
     </>
   );
 }

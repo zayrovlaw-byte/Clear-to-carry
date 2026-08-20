@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { Nav, Footer, Skyline, HomeIcon, StoreIcon, StarShieldIcon } from "@/lib/ui";
+import { Nav, Footer, Skyline, Liberty, Wordmark, LicenseIcon } from "@/lib/ui";
+import { PACKAGES } from "@/lib/content";
 
 export default function Home() {
   return (
@@ -7,22 +8,24 @@ export default function Home() {
       <Nav />
 
       <section className="v-hero">
-        <div className="v-heroglow" aria-hidden="true" />
+        <div className="v-herophoto" aria-hidden="true" />
+        <div className="v-heroscrim" aria-hidden="true" />
         <div className="v-heroinner">
-          <div className="v-hero2a" aria-hidden="true">2A</div>
+          <Wordmark size={1} />
           <h1 className="v-h1">
             Protect your home.
             <br />
             <em>Protect your business.</em>
           </h1>
           <p className="v-lede v-ledehero">
-            NYC firearm licenses. Handled by an attorney, start to finish. Flat fee.
+            New York City pistol licensing. Handled by an attorney, start to finish. Flat fee.
           </p>
           <div className="v-herobtns">
             <Link className="v-gold" href="/apply">Do I qualify? · 60 seconds</Link>
-            <Link className="v-quiet" href="/apply?view=packages">Pricing</Link>
+            <Link className="v-quiet" href="/apply?view=packages">Engagements</Link>
           </div>
         </div>
+        <Liberty className="v-liberty" />
         <Skyline />
       </section>
 
@@ -36,25 +39,18 @@ export default function Home() {
       </section>
 
       <section className="v-licenses">
+        <div className="v-licenseshead">
+          <div className="v-eyebrow">Six licences, one standard</div>
+          <h2 className="v-h2" style={{ marginBottom: 0 }}>What are you licensing?</h2>
+        </div>
         <div className="v-licensegrid">
-          <Link href="/apply?view=packages" className="v-license">
-            <HomeIcon />
-            <div className="v-licensename">Home</div>
-            <div className="v-licenseline">A firearm where your family sleeps.</div>
-            <div className="v-licenseprice">Flat fee, in writing</div>
-          </Link>
-          <Link href="/apply?view=packages" className="v-license">
-            <StoreIcon />
-            <div className="v-licensename">Business</div>
-            <div className="v-licenseline">Protection where you earn your living.</div>
-            <div className="v-licenseprice">Flat fee, in writing</div>
-          </Link>
-          <Link href="/apply?view=packages" className="v-license v-licensefeat">
-            <StarShieldIcon />
-            <div className="v-licensename">Carry</div>
-            <div className="v-licenseline">Protection that goes where you go.</div>
-            <div className="v-licenseprice">Flat fee, in writing</div>
-          </Link>
+          {PACKAGES.map((p) => (
+            <Link href="/apply?view=packages" className={"v-license" + (p.featured ? " v-licensefeat" : "")} key={p.id}>
+              <LicenseIcon name={p.icon} />
+              <div className="v-licensename">{p.name}</div>
+              <div className="v-licenseline">{p.line}</div>
+            </Link>
+          ))}
         </div>
       </section>
 

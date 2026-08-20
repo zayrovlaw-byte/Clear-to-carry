@@ -1,6 +1,56 @@
 import Link from "next/link";
 import { PHONE } from "@/lib/content";
 
+/* ---- Brand: CLEAR TO CARRY over a ghosted Bodoni 2, underlined ---- */
+export function Wordmark({ size = 1, tagline = true, ghost = true }) {
+  const s = size;
+  return (
+    <div className="b-lock" style={{ padding: ghost ? `${30 * s}px ${16 * s}px` : 0 }}>
+      {ghost && (
+        <div className="b-ghost" aria-hidden="true" style={{ fontSize: 118 * s }}>2</div>
+      )}
+      <div className="b-front">
+        <div className="b-words" style={{ fontSize: 29 * s }}>
+          CLEAR <span className="b-to">TO</span> CARRY
+        </div>
+        <div className="b-rule" style={{ margin: `${8 * s}px auto ${tagline ? 7 * s : 0}px` }} />
+        {tagline && (
+          <div className="b-tag" style={{ fontSize: Math.max(9.5 * s, 8.5) }}>
+            PISTOL LICENSING SERVICE
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* Statue of Liberty, flat geometric silhouette matching the skyline language.
+   The torch flame is the only warm accent. */
+export function Liberty({ className }) {
+  return (
+    <svg viewBox="0 0 200 420" className={className} aria-hidden="true">
+      <g fill="#171A22">
+        <rect x="55" y="368" width="90" height="18" />
+        <rect x="66" y="330" width="68" height="38" />
+        <rect x="60" y="322" width="80" height="8" />
+        <path d="M78 330 L82 220 L74 190 L88 160 L96 150 L112 150 L120 164 L128 196 L122 240 L124 330 Z" />
+        <ellipse cx="103" cy="136" rx="13" ry="15" />
+        <path d="M92 126 L84 108 L94 122 Z" />
+        <path d="M97 121 L93 100 L102 120 Z" />
+        <path d="M104 119 L104 96 L110 119 Z" />
+        <path d="M110 121 L116 102 L114 122 Z" />
+        <path d="M114 126 L124 112 L118 128 Z" />
+        <path d="M120 200 L142 214 L146 240 L134 242 L124 220 Z" />
+        <rect x="132" y="204" width="18" height="30" transform="rotate(14 141 219)" />
+        <path d="M92 160 L74 96 L64 60 L74 56 L86 92 L100 152 Z" />
+        <rect x="60" y="42" width="16" height="14" />
+      </g>
+      <path d="M68 40 C62 30 66 20 68 12 C70 20 76 24 74 32 C73 36 71 38 68 40 Z"
+        fill="#C9A96A" opacity="0.8" />
+    </svg>
+  );
+}
+
 export function Eyebrow({ children, style }) {
   return <div className="v-eyebrow" style={style}>{children}</div>;
 }
@@ -10,7 +60,7 @@ export function Crest() {
     <svg className="v-crest" viewBox="0 0 64 72" aria-hidden="true">
       <path d="M32 2 L58 12 V34 C58 52 46 64 32 70 C18 64 6 52 6 34 V12 Z" fill="none" stroke="#C9A96A" strokeWidth="2" />
       <path d="M32 10 L50 17 V34 C50 47 41 56 32 61 C23 56 14 47 14 34 V17 Z" fill="rgba(201,169,106,0.07)" stroke="#8C7443" strokeWidth="1" />
-      <text x="32" y="42" textAnchor="middle" fontFamily="Cormorant Garamond, serif" fontSize="22" fill="#C9A96A">Z</text>
+      <text x="32" y="44" textAnchor="middle" fontFamily="Bodoni Moda, serif" fontSize="26" fill="#C9A96A">2</text>
     </svg>
   );
 }
@@ -77,13 +127,55 @@ export function StarShieldIcon() {
   );
 }
 
+export function RouteIcon() {
+  return (
+    <svg className="v-cardicon" viewBox="0 0 64 64" aria-hidden="true">
+      <path d="M18 8 C24 8 28 12 28 18 C28 25 18 34 18 34 C18 34 8 25 8 18 C8 12 12 8 18 8 Z" fill="none" stroke="#C9A96A" strokeWidth="2.5" strokeLinejoin="round" />
+      <circle cx="18" cy="18" r="4" fill="#C9A96A" />
+      <path d="M46 30 C52 30 56 34 56 40 C56 47 46 56 46 56 C46 56 36 47 36 40 C36 34 40 30 46 30 Z" fill="rgba(201,169,106,0.08)" stroke="#C9A96A" strokeWidth="2.5" strokeLinejoin="round" />
+      <circle cx="46" cy="40" r="4" fill="#C9A96A" />
+      <path d="M24 34 C30 40 32 30 40 36" fill="none" stroke="#8C7443" strokeWidth="2.2" strokeLinecap="round" strokeDasharray="3 4" />
+    </svg>
+  );
+}
+
+export function LongGunIcon() {
+  return (
+    <svg className="v-cardicon" viewBox="0 0 64 64" aria-hidden="true">
+      <path d="M6 26 H54 V33 H24 L20 40 H14 L16 33 H6 Z" fill="rgba(201,169,106,0.08)" stroke="#C9A96A" strokeWidth="2.2" strokeLinejoin="round" />
+      <path d="M24 33 L30 47 H37 L33 33" fill="none" stroke="#C9A96A" strokeWidth="2.2" strokeLinejoin="round" />
+      <path d="M54 26 V22 H60 V30 H54" fill="none" stroke="#8C7443" strokeWidth="2.2" strokeLinejoin="round" />
+      <path d="M36 26 V20 H44 V26" fill="none" stroke="#8C7443" strokeWidth="2.2" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+export function BadgeIcon() {
+  return (
+    <svg className="v-cardicon" viewBox="0 0 64 64" aria-hidden="true">
+      <path d="M32 5 L52 12 V31 C52 45 43 54 32 59 C21 54 12 45 12 31 V12 Z" fill="rgba(201,169,106,0.08)" stroke="#C9A96A" strokeWidth="2.5" strokeLinejoin="round" />
+      <circle cx="32" cy="27" r="7" fill="none" stroke="#C9A96A" strokeWidth="2.4" />
+      <path d="M20 48 C22 40 26 37 32 37 C38 37 42 40 44 48" fill="none" stroke="#8C7443" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+/* Maps a licence's `icon` key in content.js to its mark. */
+export function LicenseIcon({ name }) {
+  const M = { home: HomeIcon, store: StoreIcon, shield: StarShieldIcon,
+    route: RouteIcon, longgun: LongGunIcon, badge: BadgeIcon };
+  const C = M[name] || StarShieldIcon;
+  return <C />;
+}
+
 export function Nav() {
   return (
     <header className="v-nav">
       <div className="v-navin">
         <Link href="/" style={{ textDecoration: "none" }}>
-          <div className="v-wordmark">
-            CLEAR <span className="v-wordto">TO</span> CARRY
+          <div className="b-navlock">
+            <div className="b-words b-navwords">CLEAR <span className="b-to">TO</span> CARRY</div>
+            <div className="b-rule b-navrule" />
           </div>
         </Link>
         <div className="v-navright" style={{ display: "flex", gap: 18, flexWrap: "wrap", justifyContent: "flex-end" }}>
@@ -101,11 +193,9 @@ export function Nav() {
 export function Footer() {
   return (
     <footer className="v-foot">
-      <div className="v-wordmark v-wordsm">
-        CLEAR <span className="v-wordto">TO</span> CARRY
-      </div>
-      <p className="v-foottext">
-        A service of Zayrov Law, P.C. · 3400 Lawson Blvd., Oceanside, NY 11572 · {PHONE}
+      <Wordmark size={0.72} ghost={false} />
+      <p className="v-foottext" style={{ marginTop: 14 }}>
+        A pistol licensing service of Zayrov Law, P.C. · 3400 Lawson Blvd., Oceanside, NY 11572 · {PHONE}
       </p>
       <p className="v-foottext" style={{ marginTop: 0 }}>
         <Link className="v-navlink" href="/privacy">Privacy</Link>

@@ -27,14 +27,43 @@ Open http://localhost:3000
 - `lib/content.js`  ALL copy, prices, questionnaire, phases. Edit prices here.
 - `data/`           leads.json, clients.json, uploads/ (gitignored)
 
+## Hero photograph
+
+The hero is built to take a real colour photograph. Drop a licensed image at
+`public/hero-nyc.jpg` and it takes over the hero background automatically —
+no code change. Until that file exists the layer is simply empty and the drawn
+skyline and Liberty show through, so the hero is never broken while you are
+sourcing the shot.
+
+- Landscape, about 2400px wide, shot toward Lower Manhattan or Liberty Island.
+- Golden hour or blue hour sits best against the palette; a flat grey midday
+  sky fights it.
+- A dark scrim is layered over the photo automatically so the headline stays
+  legible. You do not need to darken the image yourself.
+- To nudge the crop, change `background-position` on `.v-herophoto` in
+  `app/globals.css`.
+
+**Licensing matters here.** This is a law firm's advertising. Buy a licence
+(Getty, Adobe Stock, Stocksy), commission a local photographer, or use a shot
+you took yourself. Do not pull one off a search engine — a stock-photo demand
+letter is an expensive way to save $50.
+
 ## Before launch, in order
 
-1. Set real prices in `lib/content.js` (advertised fees bind for 30 days under RPC 7.1).
-2. Replace placeholder testimonials in `app/page.jsx` with real, consented client quotes.
-3. Add your professional portrait (replace the photo frame block in `app/page.jsx`).
-4. Sign up at resend.com (free), verify your domain, put the API key and
+1. Confirm the fee band and consultation fee in `lib/content.js` (advertised
+   fees bind for 30 days under RPC 7.1).
+2. Substantiate the figures in `RESULTS` in `lib/content.js` — see the comment
+   block above them. Keep records of applications filed and approved; update
+   `asOf` when you refresh them. If a figure cannot be proven from your own
+   files, lower it or delete it.
+3. Replace placeholder testimonials and approval specimens on `/reviews` with
+   real, consented client material.
+4. Add your professional portrait (replace the photo frame block in
+   `app/attorney/page.jsx`).
+5. Add the hero photograph (see above).
+6. Sign up at resend.com (free), verify your domain, put the API key and
    NOTIFY_EMAIL in `.env`. Until then, notifications only print to the server log.
-5. Review `/privacy` wording.
+7. Review `/privacy` wording.
 
 ## Deploy
 

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Nav, Footer, Eyebrow } from "@/lib/ui";
-import { REVIEWS, APPROVALS } from "@/lib/content";
+import { REVIEWS, APPROVALS, RESULTS, RESULTS_DISCLAIMER } from "@/lib/content";
 
 export const metadata = {
   title: "Reviews & Success Stories | Clear to Carry",
@@ -13,10 +13,22 @@ export default function ReviewsPage() {
     <div>
       <Nav />
 
-      <div className="v-page">
-        <Eyebrow>In their words</Eyebrow>
+      <div className="v-page" style={{ paddingBottom: 0 }}>
+        <Eyebrow>The record</Eyebrow>
         <h1 className="v-h1 v-h1sm">Clients who are carrying today.</h1>
       </div>
+
+      <section className="v-results">
+        <div className="v-resultsgrid">
+          {RESULTS.stats.map((s, i) => (
+            <div className="v-result" key={i}>
+              <div className="v-resultfig">{s.figure}</div>
+              <div className="v-resultlabel">{s.label}</div>
+            </div>
+          ))}
+        </div>
+        <p className="v-resultsdisc">{RESULTS_DISCLAIMER}</p>
+      </section>
 
       <section className="v-proof" style={{ paddingTop: 0 }}>
         <div className="v-approvals">

@@ -528,20 +528,22 @@ body :focus-visible { outline: 1.5px solid #C9A96A; outline-offset: 3px; }
 }
 
 .v-licenses { max-width: 960px; margin: 0 auto; padding: 64px 22px 10px; }
+.v-licenseshead { text-align: center; margin-bottom: 30px; }
+.v-licenseshead .v-eyebrow { margin-bottom: 10px; }
 .v-licensegrid { display: grid; grid-template-columns: 1fr; gap: 16px; }
 .v-license {
   display: block; text-decoration: none; text-align: center;
-  border: 1px solid #2A2D38; background: #16181F; padding: 40px 24px 34px;
+  border: 1px solid #2A2D38; background: #16181F; padding: 30px 20px 26px;
   transition: border-color .15s, transform .15s;
 }
 .v-license:hover { border-color: #C9A96A; transform: translateY(-2px); }
 .v-licensefeat { border-color: #8C7443; }
-.v-cardicon { width: 60px; height: 60px; margin: 0 auto 20px; display: block; }
+.v-cardicon { width: 52px; height: 52px; margin: 0 auto 16px; display: block; }
 .v-licensename {
-  font-family: 'Cormorant Garamond', serif; font-size: 30px; color: #F5F1E8;
-  margin-bottom: 8px;
+  font-family: 'Cormorant Garamond', serif; font-size: 24px; color: #F5F1E8;
+  margin-bottom: 8px; line-height: 1.2;
 }
-.v-licenseline { font-size: 14px; color: #8B8FA0; margin-bottom: 18px; }
+.v-licenseline { font-size: 13.5px; line-height: 1.55; color: #8B8FA0; }
 .v-licenseprice {
   font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.18em;
   text-transform: uppercase; color: #C9A96A;
@@ -594,3 +596,140 @@ body :focus-visible { outline: 1.5px solid #C9A96A; outline-offset: 3px; }
   body * { transition: none !important; }
 }
       
+
+/* ===== Brand lockup: ghosted 2, underline, tagline ===== */
+.b-lock { position: relative; display: inline-flex; }
+.b-ghost {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  z-index: 1; pointer-events: none; user-select: none;
+  font-family: 'Bodoni Moda', serif; font-weight: 600; line-height: 0.8;
+  color: #C9A96A; opacity: 0.13;
+}
+.b-front { position: relative; z-index: 2; text-align: center; }
+.b-words {
+  font-family: 'Cinzel', serif; font-weight: 600; color: #F5F1E8;
+  letter-spacing: 0.1em; line-height: 1.15; white-space: nowrap;
+}
+.b-to { color: #C9A96A; font-weight: 400; opacity: 0.75; }
+.b-rule {
+  height: 1px; width: 94%;
+  background: linear-gradient(to right, transparent, #C9A96A 18%, #C9A96A 82%, transparent);
+}
+.b-tag {
+  font-family: 'IBM Plex Mono', monospace; letter-spacing: 0.3em;
+  color: #C9A96A; opacity: 0.85; white-space: nowrap;
+}
+.b-navlock { display: inline-block; }
+.b-navwords { font-size: 15px; letter-spacing: 0.12em; }
+.b-navrule { margin-top: 4px; }
+
+/* ===== Hero photograph =====
+   Drop a licensed colour photograph of the harbour / skyline at
+   public/hero-nyc.jpg and it takes over automatically. Until then the
+   layer is simply empty and the drawn skyline + Liberty show through,
+   so the hero is never broken while the photo is being sourced.
+   Recommended: 2400px wide, landscape, shot toward Lower Manhattan
+   or Liberty Island. See README "Hero photograph". */
+.v-herophoto {
+  position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background-image: url("/hero-nyc.jpg");
+  background-size: cover; background-position: center 38%;
+  /* Keeps the colour but seats it in the brand's noir. */
+  filter: saturate(0.92) contrast(1.04);
+}
+/* Scrim: type stays legible over any photograph, and the image
+   resolves down into the page instead of stopping at a hard edge. */
+.v-heroscrim {
+  position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background:
+    linear-gradient(to bottom,
+      rgba(14,15,19,0.94) 0%,
+      rgba(14,15,19,0.72) 34%,
+      rgba(14,15,19,0.60) 58%,
+      rgba(14,15,19,0.88) 88%,
+      #0E0F13 100%),
+    radial-gradient(120% 80% at 50% 12%, rgba(201,169,106,0.13), transparent 62%);
+}
+
+/* ===== Hero: Liberty in the harbor ===== */
+.v-hero { position: relative; overflow: hidden; }
+.v-liberty {
+  position: absolute; right: -3%; bottom: 0; height: min(62vh, 420px);
+  z-index: 2; opacity: 0.9; pointer-events: none;
+}
+.v-heroinner { position: relative; z-index: 4; }
+.v-hero .v-skyline { position: relative; z-index: 3; }
+@media (max-width: 720px) {
+  .v-liberty { right: 50%; transform: translateX(50%); opacity: 0.3; height: 46vh; }
+}
+
+/* Contrast: never set small text in dim gold on noir */
+.v-heronote, .v-foottext { color: #9BA0B0; }
+.b-tag, .v-eyebrow { color: #C9A96A; }
+
+/* fee step: the one place a number appears before checkout */
+.v-feebox {
+  border: 1px solid #8C7443; background: rgba(201,169,106,0.05);
+  padding: 30px 28px; margin-top: 8px;
+}
+.v-feelabel {
+  font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.24em;
+  text-transform: uppercase; color: #8B8FA0; margin-bottom: 12px;
+}
+.v-feefigure {
+  font-family: 'Cormorant Garamond', serif; font-size: clamp(38px, 7vw, 54px);
+  line-height: 1; color: #C9A96A; margin-bottom: 20px;
+}
+.v-feenote { font-size: 14.5px; line-height: 1.75; color: #C9CBD4; margin: 0; max-width: 62ch; }
+
+/* licence cards as buttons */
+.v-packbtn {
+  text-align: center; font-family: inherit; color: inherit; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center;
+}
+.v-packbtn .v-packline, .v-packbtn .v-packfor { text-align: center; }
+.v-packbtn .v-packfor { flex: 1; }
+.v-faux { margin-top: auto; text-align: center; }
+
+/* attorney bio */
+.v-bio { max-width: 960px; margin: 0 auto; padding: 44px 22px 20px; }
+.v-bioinner { display: grid; grid-template-columns: 1fr; gap: 38px; align-items: start; }
+.v-bioaside { display: flex; flex-direction: column; gap: 20px; }
+.v-biocall { display: flex; flex-direction: column; }
+.v-creds { display: flex; flex-wrap: wrap; gap: 8px; }
+.v-cred {
+  font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.14em;
+  text-transform: uppercase; color: #C9A96A;
+  border: 1px solid #2A2D38; padding: 7px 11px;
+}
+.v-biotext .v-artp:first-child {
+  font-family: 'Cormorant Garamond', serif; font-size: 21px; line-height: 1.65;
+  color: #F5F1E8;
+}
+@media (min-width: 860px) {
+  .v-bioinner { grid-template-columns: 300px 1fr; gap: 48px; }
+  .v-bioaside { position: sticky; top: 24px; }
+}
+
+/* results figures — the disclaimer is part of the block, never separated */
+.v-results { max-width: 960px; margin: 0 auto; padding: 10px 22px 46px; }
+.v-resultsgrid {
+  display: grid; grid-template-columns: 1fr; gap: 2px;
+  background: #2A2D38; border: 1px solid #2A2D38;
+}
+.v-result { background: #16181F; padding: 32px 24px; text-align: center; }
+.v-resultfig {
+  font-family: 'Cormorant Garamond', serif; font-size: clamp(40px, 7vw, 56px);
+  line-height: 1; color: #C9A96A; margin-bottom: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.v-resultlabel {
+  font-size: 13.5px; line-height: 1.6; color: #C9CBD4; max-width: 30ch; margin: 0 auto;
+}
+.v-resultsdisc {
+  font-size: 11.5px; line-height: 1.8; color: #8B8FA0;
+  border-left: 2px solid #8C7443; padding-left: 16px; margin: 20px 0 0; max-width: 78ch;
+}
+@media (min-width: 720px) {
+  .v-resultsgrid { grid-template-columns: repeat(3, 1fr); }
+}
