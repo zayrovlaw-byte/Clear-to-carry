@@ -476,8 +476,81 @@ body :focus-visible { outline: 1.5px solid #C9A96A; outline-offset: 3px; }
 .v-conciergehead { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
 .v-conciergetext { font-size: 13px; color: #8B8FA0; }
 
+/* landing v2: graphic, minimal */
+.v-hero2a {
+  font-family: 'Cormorant Garamond', serif; font-weight: 600;
+  font-size: 15px; letter-spacing: 0.3em; color: #C9A96A;
+  border: 1.5px solid #8C7443; border-radius: 50%;
+  width: 58px; height: 58px; line-height: 56px; text-align: center;
+  margin: 0 auto 26px; text-indent: 0.3em;
+}
+.v-ledehero { max-width: 44ch; margin-bottom: 32px; font-size: 17px; }
+
+.v-amend {
+  border-top: 1px solid #2A2D38; border-bottom: 1px solid #2A2D38;
+  background: #16181F; text-align: center; padding: 64px 22px;
+  position: relative; overflow: hidden;
+}
+.v-amend::before {
+  content: "II"; position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -54%);
+  font-family: 'Cormorant Garamond', serif; font-size: 300px; line-height: 1;
+  color: rgba(201,169,106,0.05); pointer-events: none;
+}
+.v-amendquote {
+  position: relative; font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(24px, 4.6vw, 38px); line-height: 1.35; color: #F5F1E8;
+  max-width: 24ch; margin: 0 auto 22px;
+}
+.v-amendquote em { color: #C9A96A; }
+.v-amendattr {
+  position: relative; font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+  letter-spacing: 0.26em; text-transform: uppercase; color: #8B8FA0;
+}
+.v-amendnote {
+  position: relative; margin-top: 18px; font-size: 15px; color: #C9CBD4;
+}
+
+.v-licenses { max-width: 960px; margin: 0 auto; padding: 64px 22px 10px; }
+.v-licensegrid { display: grid; grid-template-columns: 1fr; gap: 16px; }
+.v-license {
+  display: block; text-decoration: none; text-align: center;
+  border: 1px solid #2A2D38; background: #16181F; padding: 40px 24px 34px;
+  transition: border-color .15s, transform .15s;
+}
+.v-license:hover { border-color: #C9A96A; transform: translateY(-2px); }
+.v-licensefeat { border-color: #8C7443; }
+.v-cardicon { width: 60px; height: 60px; margin: 0 auto 20px; display: block; }
+.v-licensename {
+  font-family: 'Cormorant Garamond', serif; font-size: 30px; color: #F5F1E8;
+  margin-bottom: 8px;
+}
+.v-licenseline { font-size: 14px; color: #8B8FA0; margin-bottom: 18px; }
+.v-licenseprice {
+  font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.18em;
+  text-transform: uppercase; color: #C9A96A;
+}
+
+.v-steps { max-width: 960px; margin: 0 auto; padding: 54px 22px 64px; }
+.v-stepsgrid { display: grid; grid-template-columns: 1fr; gap: 30px; }
+.v-step { text-align: center; }
+.v-stepnum {
+  font-family: 'Cormorant Garamond', serif; font-size: 52px; line-height: 1;
+  color: #C9A96A; margin-bottom: 12px;
+}
+.v-steptitle {
+  font-size: 15px; font-weight: 600; letter-spacing: 0.14em;
+  text-transform: uppercase; color: #F5F1E8; margin-bottom: 8px;
+}
+.v-steptext { font-size: 14px; line-height: 1.6; color: #8B8FA0; max-width: 30ch; margin: 0 auto; }
+
+.v-finalcta { max-width: 960px; margin: 0 auto; padding: 72px 22px 90px; text-align: center; }
+.v-goldem { font-style: italic; color: #C9A96A; }
+
 @media (min-width: 720px) {
   .v-bandin { grid-template-columns: repeat(3, 1fr); }
+  .v-licensegrid { grid-template-columns: repeat(3, 1fr); }
+  .v-stepsgrid { grid-template-columns: repeat(3, 1fr); }
   .v-attorneyinner { grid-template-columns: 340px 1fr; }
   .v-stickycta { display: none; }
   .v-lifegrid { grid-template-columns: 1fr 1fr; }
