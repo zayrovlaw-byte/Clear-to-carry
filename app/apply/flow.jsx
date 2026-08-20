@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Eyebrow } from "@/lib/ui";
-import { PACKAGES, TIERS, QUALIFY, PHASES, ZELLE_TO, PHONE, PHONE_TEL } from "@/lib/content";
+import { PACKAGES, TIERS, QUALIFY, PHASES, THIRD_PARTY_COSTS, FEE_RANGE, ZELLE_TO, PHONE, PHONE_TEL } from "@/lib/content";
 
 const GREEN = "#5FA97F", RED = "#C25450", CHAMPAGNE = "#C9A96A";
 const fmt = (n) => "$" + n.toLocaleString();
@@ -182,22 +182,54 @@ function Packages({ go, choose }) {
       </div>
       {showLicenses && (
         <div className="v-licenseblock">
-          <div className="v-licensehead"><Eyebrow>Full Representation · by license</Eyebrow></div>
+          <div className="v-licensehead"><Eyebrow>Full Representation · {FEE_RANGE} · by license</Eyebrow></div>
+          <p className="v-mutetext" style={{ maxWidth: "62ch" }}>
+            Every license type below is handled for the same flat fee band. What moves
+            the number is your record, not your license. We quote your exact figure at
+            the consultation and fix it in the engagement letter.
+          </p>
           <div className="v-packs">
             {PACKAGES.map((p) => (
               <div key={p.id} className={"v-pack" + (p.featured ? " v-packfeat" : "")}>
                 {p.featured && <div className="v-featribbon">Flagship</div>}
                 <div className="v-packtier">{p.tier}</div>
                 <div className="v-packname">{p.name}</div>
-                <div className="v-packprice">{fmt(p.price)}</div>
+                <div className="v-packprice">{FEE_RANGE}</div>
                 <p className="v-packline">{p.line}</p>
                 <p className="v-packfor">{p.for}</p>
-                <button className={p.featured ? "v-gold v-w100" : "v-quiet v-w100"} onClick={() => choose(p)}>Begin</button>
+                <button className={p.featured ? "v-gold v-w100" : "v-quiet v-w100"} onClick={() => go("consult")}>Get my exact fee</button>
               </div>
             ))}
           </div>
         </div>
       )}
+
+      <div className="v-costs">
+        <Eyebrow>What else this costs</Eyebrow>
+        <h2 className="v-h2" style={{ marginBottom: 14 }}>Three fees that are not ours.</h2>
+        <p className="v-mutetext" style={{ maxWidth: "62ch", marginBottom: 22 }}>
+          Every applicant pays these, with or without an attorney. They go to the City,
+          the State, and your course provider, never to this firm. Amounts are set by
+          them and change, so we confirm current figures at your consultation rather
+          than advertise a number that may be stale when you read it.
+        </p>
+        <div className="v-costlist">
+          {THIRD_PARTY_COSTS.map((c) => (
+            <div className="v-costrow" key={c.id}>
+              <div className="v-costname">{c.name}</div>
+              <div className="v-costnote">{c.note}</div>
+            </div>
+          ))}
+        </div>
+        <div className="v-costincluded">
+          <span className="v-costincludedmark" aria-hidden="true">✓</span>
+          <span>
+            All three are <strong>included in the Concierge engagement</strong>. In every
+            other engagement you pay them directly to the third party.
+          </span>
+        </div>
+      </div>
+
       <div className="v-underpacks">
         <p className="v-mutetext">Not certain where to start? The first phone call is free and the answer is honest.</p>
         <button className="v-quiet" onClick={() => go("consult")}>Request free consultation</button>

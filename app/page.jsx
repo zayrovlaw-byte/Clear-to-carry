@@ -41,19 +41,19 @@ export default function Home() {
             <HomeIcon />
             <div className="v-licensename">Home</div>
             <div className="v-licenseline">A firearm where your family sleeps.</div>
-            <div className="v-licenseprice">From $2,500</div>
+            <div className="v-licenseprice">Flat fee, in writing</div>
           </Link>
           <Link href="/apply?view=packages" className="v-license">
             <StoreIcon />
             <div className="v-licensename">Business</div>
             <div className="v-licenseline">Protection where you earn your living.</div>
-            <div className="v-licenseprice">From $3,500</div>
+            <div className="v-licenseprice">Flat fee, in writing</div>
           </Link>
           <Link href="/apply?view=packages" className="v-license v-licensefeat">
             <StarShieldIcon />
             <div className="v-licensename">Carry</div>
             <div className="v-licenseline">Protection that goes where you go.</div>
-            <div className="v-licenseprice">From $5,000</div>
+            <div className="v-licenseprice">Flat fee, in writing</div>
           </Link>
         </div>
       </section>
