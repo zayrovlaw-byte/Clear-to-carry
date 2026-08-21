@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { PHONE } from "@/lib/content";
 
-/* ---- Brand: CLEAR TO CARRY over a ghosted Bodoni 2, underlined ---- */
+/* ---- Brand: CLEAR TO CARRY over a ghosted 2, underlined.
+   This lockup is the only mark. There is no separate crest. ---- */
 export function Wordmark({ size = 1, tagline = true, ghost = true }) {
   const s = size;
   return (
@@ -53,16 +54,6 @@ export function Liberty({ className }) {
 
 export function Eyebrow({ children, style }) {
   return <div className="v-eyebrow" style={style}>{children}</div>;
-}
-
-export function Crest() {
-  return (
-    <svg className="v-crest" viewBox="0 0 64 72" aria-hidden="true">
-      <path d="M32 2 L58 12 V34 C58 52 46 64 32 70 C18 64 6 52 6 34 V12 Z" fill="none" stroke="#C9A96A" strokeWidth="2" />
-      <path d="M32 10 L50 17 V34 C50 47 41 56 32 61 C23 56 14 47 14 34 V17 Z" fill="rgba(201,169,106,0.07)" stroke="#8C7443" strokeWidth="1" />
-      <text x="32" y="44" textAnchor="middle" fontFamily="Bodoni Moda, serif" fontSize="26" fill="#C9A96A">2</text>
-    </svg>
-  );
 }
 
 export function Skyline() {

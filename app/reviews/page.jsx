@@ -18,7 +18,7 @@ export default function ReviewsPage() {
         <h1 className="v-h1 v-h1sm">Clients who are carrying today.</h1>
       </div>
 
-      <section className="v-results">
+      <section className="v-results" data-reveal>
         <div className="v-resultsgrid">
           {RESULTS.stats.map((s, i) => (
             <div className="v-result" key={i}>

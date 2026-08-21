@@ -602,13 +602,13 @@ body :focus-visible { outline: 1.5px solid #C9A96A; outline-offset: 3px; }
 .b-ghost {
   position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
   z-index: 1; pointer-events: none; user-select: none;
-  font-family: 'Bodoni Moda', serif; font-weight: 600; line-height: 0.8;
+  font-family: 'Cormorant Garamond', serif; font-weight: 600; line-height: 0.8;
   color: #C9A96A; opacity: 0.13;
 }
 .b-front { position: relative; z-index: 2; text-align: center; }
 .b-words {
-  font-family: 'Cinzel', serif; font-weight: 600; color: #F5F1E8;
-  letter-spacing: 0.1em; line-height: 1.15; white-space: nowrap;
+  font-family: 'Cormorant Garamond', serif; font-weight: 600; color: #F5F1E8;
+  letter-spacing: 0.17em; line-height: 1.15; white-space: nowrap;
 }
 .b-to { color: #C9A96A; font-weight: 400; opacity: 0.75; }
 .b-rule {
@@ -632,7 +632,10 @@ body :focus-visible { outline: 1.5px solid #C9A96A; outline-offset: 3px; }
    or Liberty Island. See README "Hero photograph". */
 .v-herophoto {
   position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  /* WebP where supported (84 KB), JPEG fallback (275 KB) for anything older. */
   background-image: url("/hero-nyc.jpg");
+  background-image: -webkit-image-set(url("/hero-nyc.webp") type("image/webp"), url("/hero-nyc.jpg") type("image/jpeg"));
+  background-image: image-set(url("/hero-nyc.webp") type("image/webp"), url("/hero-nyc.jpg") type("image/jpeg"));
   background-size: cover; background-position: center 38%;
   /* Keeps the colour but seats it in the brand's noir. */
   filter: saturate(0.92) contrast(1.04);
@@ -749,4 +752,28 @@ body :focus-visible { outline: 1.5px solid #C9A96A; outline-offset: 3px; }
   .v-navright { gap: 12px !important; }
   .v-navlink { font-size: 10.5px; letter-spacing: 0.06em; }
   .b-navwords { font-size: 13px; letter-spacing: 0.1em; }
+}
+
+/* The portrait frame echoes the wordmark's ghosted numeral rather than
+   introducing a second mark. */
+.v-photomark {
+  font-family: 'Cormorant Garamond', serif; font-weight: 600; font-size: 76px;
+  line-height: 1; color: #C9A96A; opacity: 0.16;
+}
+
+/* Scroll reveal. The hidden state is scoped to .js-reveal, added by the
+   Reveal component, so the page is fully visible without JavaScript. */
+.js-reveal [data-reveal] {
+  opacity: 0;
+  transform: translateY(16px);
+  will-change: opacity, transform;
+}
+.js-reveal [data-reveal].is-in {
+  opacity: 1;
+  transform: none;
+  transition: opacity .75s ease, transform .75s cubic-bezier(.22,.7,.3,1);
+  will-change: auto;
+}
+@media (prefers-reduced-motion: reduce) {
+  .js-reveal [data-reveal] { opacity: 1; transform: none; }
 }

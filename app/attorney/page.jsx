@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Nav, Footer, Eyebrow, Crest, Skyline } from "@/lib/ui";
+import { Nav, Footer, Eyebrow, Skyline } from "@/lib/ui";
 import { ATTORNEY, PHONE, PHONE_TEL } from "@/lib/content";
 
 export const metadata = {
@@ -17,7 +17,7 @@ export default function AttorneyPage() {
         <div className="v-bioinner">
           <aside className="v-bioaside">
             <div className="v-photoframe">
-              <Crest />
+              <div className="v-photomark" aria-hidden="true">2</div>
               <div className="v-photonote">
                 Professional portrait of the attorney goes here at launch. Dark suit,
                 office or courthouse steps. People retain a face, not a logo.
@@ -58,7 +58,7 @@ export default function AttorneyPage() {
         <span>Flat fee, in writing</span>
       </div>
 
-      <section className="v-finalcta">
+      <section className="v-finalcta" data-reveal>
         <h2 className="v-h2" style={{ marginBottom: 22 }}>
           The first phone call is free.
           <br />

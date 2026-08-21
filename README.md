@@ -27,6 +27,14 @@ Open http://localhost:3000
 - `lib/content.js`  ALL copy, prices, questionnaire, phases. Edit prices here.
 - `data/`           leads.json, clients.json, uploads/ (gitignored)
 
+## Brand
+
+One mark: the CLEAR TO CARRY lockup, set in Cormorant Garamond over a ghosted
+numeral 2, underlined, with PISTOL LICENSING SERVICE beneath. There is no
+separate crest. Three typefaces total and no more: Cormorant Garamond for
+display, Inter for body, IBM Plex Mono for labels and eyebrows. Adding a
+fourth is how a brand stops looking like one.
+
 ## Hero photograph
 
 The hero is built to take a real colour photograph. Drop a licensed image at

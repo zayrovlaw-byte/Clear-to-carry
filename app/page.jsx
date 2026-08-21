@@ -37,7 +37,7 @@ export default function Home() {
         {!heroPhoto && <Skyline />}
       </section>
 
-      <section className="v-amend">
+      <section className="v-amend" data-reveal>
         <p className="v-amendquote">
           &ldquo;&hellip;the right of the people to keep and bear arms,
           <em> shall not be infringed.</em>&rdquo;
@@ -46,7 +46,7 @@ export default function Home() {
         <div className="v-amendnote">It applies in New York. We make it official.</div>
       </section>
 
-      <section className="v-licenses">
+      <section className="v-licenses" data-reveal>
         <div className="v-licenseshead">
           <div className="v-eyebrow">Six licences, one standard</div>
           <h2 className="v-h2" style={{ marginBottom: 0 }}>What are you licensing?</h2>
@@ -62,7 +62,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="v-steps">
+      <section className="v-steps" data-reveal>
         <div className="v-stepsgrid">
           <div className="v-step">
             <div className="v-stepnum">1</div>
@@ -90,7 +90,7 @@ export default function Home() {
         <span>Flat fee, in writing</span>
       </div>
 
-      <section className="v-finalcta">
+      <section className="v-finalcta" data-reveal>
         <h2 className="v-h2" style={{ marginBottom: 24 }}>
           Six months from a complete file.
           <br />
