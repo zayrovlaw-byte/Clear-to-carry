@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Eyebrow, LicenseIcon } from "@/lib/ui";
 import { PACKAGES, TIERS, QUALIFY, PHASES, THIRD_PARTY_COSTS, FEE_RANGE, ZELLE_TO, PHONE, PHONE_TEL } from "@/lib/content";
 
-const GREEN = "#5FA97F", RED = "#C25450", CHAMPAGNE = "#C9A96A";
+const GREEN = "#5FA97F", RED = "#D25A40", CHAMPAGNE = "#E3A64F";
 const fmt = (n) => "$" + n.toLocaleString();
 
 function Field({ label, area, ...props }) {

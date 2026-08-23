@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import Link from "next/link";
-import { Nav, Footer, Skyline, Liberty, Wordmark, LicenseIcon } from "@/lib/ui";
+import { Nav, Footer, Eyebrow, Skyline, Liberty, Wordmark, LicenseIcon, LicenseCard } from "@/lib/ui";
 import { PACKAGES } from "@/lib/content";
 
 /* A real photograph, when one has been supplied, replaces the drawn skyline
@@ -32,6 +32,7 @@ export default function Home() {
             <Link className="v-gold" href="/apply">Do I qualify? · 60 seconds</Link>
             <Link className="v-quiet" href="/apply?view=packages">Engagements</Link>
           </div>
+          <div className="v-heronote">Built to finish &middot; filed complete the first time &middot; 180-day clock enforced</div>
         </div>
         {!heroPhoto && <Liberty className="v-liberty" />}
         {!heroPhoto && <Skyline />}
@@ -44,6 +45,57 @@ export default function Home() {
         </p>
         <div className="v-amendattr">Amendment II · United States Constitution</div>
         <div className="v-amendnote">It applies in New York. We make it official.</div>
+      </section>
+
+      <section className="v-expedite" data-reveal>
+        <div className="v-expediteinner">
+          <Eyebrow style={{ textAlign: "center" }}>Why applications die</Eyebrow>
+          <h2 className="v-h2" style={{ textAlign: "center" }}>
+            Alone, this takes years.
+            <br />
+            <em className="v-goldem">Most never finish.</em>
+          </h2>
+          <p className="v-lede v-ledesm" style={{ margin: "0 auto 46px", textAlign: "center" }}>
+            Deficient files sit in the backlog. Returned packages restart the clock.
+            Somewhere in year two, most people quit. There is no secret handshake
+            inside the License Division &mdash; the expedite is a file with nothing
+            to send back.
+          </p>
+
+          <div className="v-ruler" aria-hidden="true">
+            <span>Month 0</span><span>6</span><span>12</span><span>18+</span>
+          </div>
+
+          <div className="v-track2r v-trackdiy">
+            <div className="v-tracklabel">Applying alone</div>
+            <div className="v-trackbar v-bardiy" aria-hidden="true" />
+            <ol className="v-trackstops">
+              <li>Forms begin</li>
+              <li>Returned &middot; gaps found</li>
+              <li>Clock restarts</li>
+              <li className="v-stopdead">Abandoned</li>
+            </ol>
+          </div>
+
+          <div className="v-track2r v-trackus">
+            <div className="v-tracklabel v-goldtext">Represented by Zayrov Law</div>
+            <div className="v-trackbar v-barflame" aria-hidden="true" />
+            <ol className="v-trackstops">
+              <li>Filed complete, first time</li>
+              <li>Investigator answered by counsel</li>
+              <li>180-day clock enforced</li>
+            </ol>
+            <div className="v-trackcardslot">
+              <LicenseCard className="v-trackcard" />
+              <div className="v-tracksaved">the year you never spend</div>
+            </div>
+          </div>
+
+          <p className="v-expeditefoot">
+            We cannot make the NYPD faster than the law requires. We make sure the
+            clock starts, keeps running, and never resets.
+          </p>
+        </div>
       </section>
 
       <section className="v-licenses" data-reveal>

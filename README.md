@@ -29,8 +29,14 @@ Open http://localhost:3000
 
 ## Brand
 
+Scheme: espresso ground (#150E08), hot amber accent (#E3A64F), and a flame
+gradient (#F6C45A - #E2703A - #B33A2B) reserved for the brand rule and the
+expedite timeline. Heat is the motif; the flame gradient is never used for
+ordinary borders or text.
+
 One mark: the CLEAR TO CARRY lockup, set in Cormorant Garamond over a ghosted
-numeral 2, underlined, with PISTOL LICENSING SERVICE beneath. There is no
+numeral 2, underlined with the flame rule, with PISTOL LICENSING SERVICE
+beneath. There is no
 separate crest. Three typefaces total and no more: Cormorant Garamond for
 display, Inter for body, IBM Plex Mono for labels and eyebrows. Adding a
 fourth is how a brand stops looking like one.

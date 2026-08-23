@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" fill="#0E0F13"/>
-  <rect x="3" y="3" width="58" height="58" fill="none" stroke="#C9A96A" stroke-width="2.5"/>
-  <text x="32" y="41" text-anchor="middle" fill="#C9A96A"
+  <rect width="64" height="64" fill="#150E08"/>
+  <rect x="3" y="3" width="58" height="58" fill="none" stroke="#E3A64F" stroke-width="2.5"/>
+  <text x="32" y="41" text-anchor="middle" fill="#E3A64F"
     font-family="Georgia, 'Times New Roman', serif"
     font-size="34" font-weight="600">2</text>
-  <rect x="20" y="49" width="24" height="1.6" fill="#8C7443"/>
+  <rect x="20" y="49" width="24" height="1.6" fill="#A5732F"/>
 </svg>
