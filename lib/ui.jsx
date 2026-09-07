@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { PHONE, PHONE_TEL } from "@/lib/content";
+import Ribbon from "@/lib/ribbon";
 
 /* ---- Brand: CLEAR TO CARRY over a ghosted 2, underlined.
    This lockup is the only mark. There is no separate crest. ---- */
@@ -216,6 +217,7 @@ export function Nav() {
           <a className="v-navlink v-navphone" href={PHONE_TEL}>{PHONE}</a>
         </div>
       </div>
+      <Ribbon />
     </header>
   );
 }

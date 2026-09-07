@@ -864,3 +864,29 @@ input, select, textarea { accent-color: #E3A64F; }
   .v-trackcardslot { position: static; width: 58%; margin: 26px auto 0; }
   .v-barflame { width: 86%; }
 }
+
+/* seasonal ribbon */
+.v-ribbon {
+  position: relative; border-top: 1px solid #3B2A1D;
+  background: linear-gradient(to right, rgba(179,58,43,0.16), rgba(227,166,79,0.12), rgba(179,58,43,0.16));
+}
+.v-ribbonlink {
+  display: flex; align-items: center; justify-content: center; gap: 14px;
+  flex-wrap: wrap; text-decoration: none; padding: 10px 44px 10px 18px;
+}
+.v-ribbontag {
+  font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; letter-spacing: 0.24em;
+  text-transform: uppercase; color: #150E08; background: #E3A64F; padding: 4px 9px;
+}
+.v-ribbonmsg { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 16px; color: #F7EFE1; }
+.v-ribboncta {
+  font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.12em;
+  text-transform: uppercase; color: #E3A64F; white-space: nowrap;
+}
+.v-ribbonlink:hover .v-ribboncta { color: #F0BE6C; }
+.v-ribbonx {
+  position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+  background: none; border: none; color: #A8927C; font-size: 18px; padding: 4px 10px;
+}
+.v-ribbonx:hover { color: #F7EFE1; }
+@media (max-width: 720px) { .v-ribbonmsg { display: none; } }

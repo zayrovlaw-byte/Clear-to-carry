@@ -30,7 +30,7 @@ export default function Home() {
           </p>
           <div className="v-herobtns">
             <Link className="v-gold" href="/apply">Do I qualify? · 60 seconds</Link>
-            <Link className="v-quiet" href="/apply?view=packages">Engagements</Link>
+            <Link className="v-quiet" href="/apply?view=quick">$99 consult · 10 minutes</Link>
           </div>
           <div className="v-heronote">Built to finish &middot; filed complete the first time &middot; 180-day clock enforced</div>
         </div>
@@ -135,6 +135,8 @@ export default function Home() {
       </section>
 
       <div className="v-truststrip">
+        <span>Among the first NY firms in post-Bruen licensing</span>
+        <span className="v-trustdot" aria-hidden="true" />
         <span>One attorney, your file personally</span>
         <span className="v-trustdot" aria-hidden="true" />
         <span>Privileged and confidential</span>

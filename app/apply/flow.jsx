@@ -165,11 +165,13 @@ function Packages({ go, choose, pickLicense }) {
             {t.featured && <div className="v-featribbon">Most engaged</div>}
             <div className="v-packtier">{t.tier}</div>
             <div className="v-packname">{t.name}</div>
+            {t.quick && <div className="v-packprice">{fmt(t.price)}</div>}
             <p className="v-packline">{t.line}</p>
             <p className="v-packfor">{t.for}</p>
             {t.checkout && (
-              <button className="v-quiet v-w100" onClick={() => choose({ id: t.id, name: t.name, price: t.price })}>
-                Continue
+              <button className={t.quick ? "v-gold v-w100" : "v-quiet v-w100"}
+                onClick={() => choose({ id: t.id, name: t.name, price: t.price })}>
+                {t.quick ? "Book my 10 minutes" : "Continue"}
               </button>
             )}
             {t.expands && (
@@ -220,7 +222,7 @@ function Packages({ go, choose, pickLicense }) {
 /* ---------------- fee ----------------
    Where price finally appears: one click from checkout, after the visitor has
    picked a licence. Shows the band, what moves it, and the third-party costs. */
-function Fee({ lic, go }) {
+function Fee({ lic, go, choose }) {
   return (
     <div className="v-page v-mid">
       <button className="v-back" onClick={() => go("packages")}>← Engagements</button>
@@ -264,8 +266,11 @@ function Fee({ lic, go }) {
         </div>
       </div>
 
-      <button className="v-gold v-w100 v-mt" onClick={() => go("consult")}>
-        Get my exact fee · free consultation
+      <button className="v-gold v-w100 v-mt" onClick={() => choose({ id: QUICK.id, name: QUICK.name, price: QUICK.price })}>
+        Not sure yet? {fmt(QUICK.price)} · 10 minutes with the attorney first
+      </button>
+      <button className="v-quiet v-w100 v-mt" onClick={() => go("consult")}>
+        Get my exact fee · free callback
       </button>
       <p className="v-mutetext v-mt">
         Nothing is owed today. We quote your figure, send the engagement letter, and
@@ -378,14 +383,18 @@ function Checkout({ pack, go, onOpened }) {
           <label className="v-ack">
             <input type="checkbox" checked={ack} onChange={(e) => setAck(e.target.checked)} />
             <span>
-              I understand that representation begins when I sign the engagement
-              letter Zayrov Law sends me and payment clears, that the fee shown is a
-              flat fee for the selected engagement, and that no outcome is promised.
+              {pack.id === "tier-quick"
+                ? "I understand the fee shown is for a 10-minute phone consultation providing general guidance about my situation, that no outcome is promised, and that no attorney-client relationship for representation is formed until a signed engagement letter and payment for an engagement are received."
+                : "I understand that representation begins when I sign the engagement letter Zayrov Law sends me and payment clears, that the fee shown is a flat fee for the selected engagement, and that no outcome is promised."}
             </span>
           </label>
           {err && <p className="v-mutetext" style={{ color: RED }}>{err}</p>}
           <button className="v-gold v-w100" onClick={toZelle} disabled={!infoReady}>Continue to payment</button>
-          <p className="v-mutetext v-mt">Your engagement letter follows by email. Representation begins on signed letter and cleared payment.</p>
+          <p className="v-mutetext v-mt">
+            {pack.id === "tier-quick"
+              ? "Pay, and we call you to set the ten minutes — same week, often same day."
+              : "Your engagement letter follows by email. Representation begins on signed letter and cleared payment."}
+          </p>
         </div>
       )}
 
@@ -625,10 +634,15 @@ function Portal({ clientId, go }) {
 }
 
 /* ---------------- flow ---------------- */
+const QUICK = TIERS.find((t) => t.quick);
+
 export default function Flow() {
   const params = useSearchParams();
-  const [view, setView] = useState(params.get("view") || "qualify");
-  const [pack, setPack] = useState(null);
+  const requested = params.get("view") || "qualify";
+  const [view, setView] = useState(requested === "quick" ? "checkout" : requested);
+  const [pack, setPack] = useState(
+    requested === "quick" ? { id: QUICK.id, name: QUICK.name, price: QUICK.price } : null
+  );
   const [lic, setLic] = useState(null);
   const [clientId, setClientId] = useState(null);
 
@@ -659,7 +673,7 @@ export default function Flow() {
     <>
       {view === "qualify" && <Qualify go={go} />}
       {view === "packages" && packagesView}
-      {view === "fee" && (lic ? <Fee lic={lic} go={go} /> : packagesView)}
+      {view === "fee" && (lic ? <Fee lic={lic} go={go} choose={choose} /> : packagesView)}
       {view === "consult" && <Consult go={go} />}
       {view === "checkout" && (pack ? <Checkout pack={pack} go={go} onOpened={openPortal} /> : packagesView)}
       {view === "portal" && (clientId ? <Portal clientId={clientId} go={go} /> : packagesView)}
