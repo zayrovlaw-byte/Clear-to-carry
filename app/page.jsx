@@ -118,7 +118,7 @@ export default function Home() {
             </div>
             <div className="v-whocard">
               <FileCheckIcon />
-              <div className="v-whotitle">An old arrest, a lingering doubt</div>
+              <div className="v-whotitle">Arrested before? You may still be eligible.</div>
               <p className="v-whotext">
                 A minor charge from years ago stops more people at the door than any
                 law does. The truth: most records are not bars. A felony disqualifies,
