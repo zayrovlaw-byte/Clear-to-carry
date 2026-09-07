@@ -890,3 +890,31 @@ input, select, textarea { accent-color: #E3A64F; }
 }
 .v-ribbonx:hover { color: #F7EFE1; }
 @media (max-width: 720px) { .v-ribbonmsg { display: none; } }
+
+/* who this is for */
+.v-whofor { max-width: 960px; margin: 0 auto; padding: 68px 22px 56px; }
+.v-whogrid { display: grid; grid-template-columns: 1fr; gap: 16px; margin-top: 8px; }
+.v-whocard {
+  border: 1px solid #3B2A1D; border-top: 2px solid #E3A64F;
+  background: #211611; padding: 34px 28px 30px; text-align: left;
+}
+.v-whocard .v-cardicon { margin: 0 0 18px; }
+.v-whotitle {
+  font-family: 'Cormorant Garamond', serif; font-size: 26px; color: #F7EFE1;
+  margin-bottom: 12px;
+}
+.v-whotext { font-size: 14.5px; line-height: 1.75; color: #A8927C; margin: 0; }
+.v-whocta { text-align: center; margin-top: 40px; }
+.v-whoclose {
+  font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 22px;
+  color: #DACCB8; margin: 0 0 22px;
+}
+.v-packfine {
+  font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; letter-spacing: 0.16em;
+  text-transform: uppercase; color: #A5732F; margin: -8px 0 14px;
+}
+.v-ribbonfine {
+  font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.14em;
+  text-transform: uppercase; color: #A8927C;
+}
+@media (min-width: 720px) { .v-whogrid { grid-template-columns: 1fr 1fr; } }

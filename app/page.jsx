@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import Link from "next/link";
-import { Nav, Footer, Eyebrow, Skyline, Liberty, Wordmark, LicenseIcon, LicenseCard } from "@/lib/ui";
+import { Nav, Footer, Eyebrow, Skyline, Liberty, Wordmark, LicenseIcon, LicenseCard, ClockIcon, FileCheckIcon } from "@/lib/ui";
 import { PACKAGES } from "@/lib/content";
 
 /* A real photograph, when one has been supplied, replaces the drawn skyline
@@ -30,9 +30,9 @@ export default function Home() {
           </p>
           <div className="v-herobtns">
             <Link className="v-gold" href="/apply">Do I qualify? · 60 seconds</Link>
-            <Link className="v-quiet" href="/apply?view=quick">$99 consult · 10 minutes</Link>
+            <Link className="v-quiet" href="/apply?view=quick">Get started · $99</Link>
           </div>
-          <div className="v-heronote">Built to finish &middot; filed complete the first time &middot; 180-day clock enforced</div>
+          <div className="v-heronote">$99 gets you started &middot; initial consultation with the attorney &middot; flat fees in writing</div>
         </div>
         {!heroPhoto && <Liberty className="v-liberty" />}
         {!heroPhoto && <Skyline />}
@@ -95,6 +95,45 @@ export default function Home() {
             We cannot make the NYPD faster than the law requires. We make sure the
             clock starts, keeps running, and never resets.
           </p>
+        </div>
+      </section>
+
+      <section className="v-whofor" data-reveal>
+        <div className="v-whoforinner">
+          <Eyebrow style={{ textAlign: "center" }}>Who this is for</Eyebrow>
+          <h2 className="v-h2" style={{ textAlign: "center" }}>
+            Two kinds of people call us.
+            <br />
+            <em className="v-goldem">Neither has time to waste.</em>
+          </h2>
+          <div className="v-whogrid">
+            <div className="v-whocard">
+              <ClockIcon />
+              <div className="v-whotitle">No time to fight paperwork</div>
+              <p className="v-whotext">
+                You run a business, close late, carry the deposit home. This process
+                rewards people with free afternoons and punishes everyone else. Our
+                clients sign where we tell them to sign. We do the rest.
+              </p>
+            </div>
+            <div className="v-whocard">
+              <FileCheckIcon />
+              <div className="v-whotitle">An old arrest, a lingering doubt</div>
+              <p className="v-whotext">
+                A minor charge from years ago stops more people at the door than any
+                law does. The truth: most records are not bars. A felony disqualifies,
+                and certain misdemeanors and active orders do. Nearly everything else
+                is a presentation problem &mdash; and presenting it is our job.
+              </p>
+            </div>
+          </div>
+          <div className="v-whocta">
+            <p className="v-whoclose">Most people are eligible. Find out where you stand.</p>
+            <div className="v-herobtns">
+              <Link className="v-gold" href="/apply">Free 60-second screening</Link>
+              <Link className="v-quiet" href="/apply?view=quick">Get started · $99</Link>
+            </div>
+          </div>
         </div>
       </section>
 

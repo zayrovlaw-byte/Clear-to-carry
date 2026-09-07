@@ -165,13 +165,18 @@ function Packages({ go, choose, pickLicense }) {
             {t.featured && <div className="v-featribbon">Most engaged</div>}
             <div className="v-packtier">{t.tier}</div>
             <div className="v-packname">{t.name}</div>
-            {t.quick && <div className="v-packprice">{fmt(t.price)}</div>}
+            {t.quick && (
+              <div>
+                <div className="v-packprice">{fmt(t.price)}</div>
+                <div className="v-packfine">{t.fine}</div>
+              </div>
+            )}
             <p className="v-packline">{t.line}</p>
             <p className="v-packfor">{t.for}</p>
             {t.checkout && (
               <button className={t.quick ? "v-gold v-w100" : "v-quiet v-w100"}
                 onClick={() => choose({ id: t.id, name: t.name, price: t.price })}>
-                {t.quick ? "Book my 10 minutes" : "Continue"}
+                {t.quick ? "Get started now" : "Continue"}
               </button>
             )}
             {t.expands && (
@@ -267,7 +272,7 @@ function Fee({ lic, go, choose }) {
       </div>
 
       <button className="v-gold v-w100 v-mt" onClick={() => choose({ id: QUICK.id, name: QUICK.name, price: QUICK.price })}>
-        Not sure yet? {fmt(QUICK.price)} · 10 minutes with the attorney first
+        Not ready to commit? Get started for {fmt(QUICK.price)}
       </button>
       <button className="v-quiet v-w100 v-mt" onClick={() => go("consult")}>
         Get my exact fee · free callback
@@ -373,7 +378,7 @@ function Checkout({ pack, go, onOpened }) {
       <button className="v-back" onClick={() => go("packages")}>← Engagements</button>
       <Eyebrow>Retain counsel</Eyebrow>
       <h1 className="v-h1 v-h1sm">{pack.name}</h1>
-      <div className="v-checkprice">{fmt(pack.price)} <span className="v-checkflat">flat fee</span></div>
+      <div className="v-checkprice">{fmt(pack.price)} <span className="v-checkflat">{pack.id === "tier-quick" ? "initial consultation" : "flat fee"}</span></div>
 
       {step === "info" && (
         <div className="v-form">
@@ -384,7 +389,7 @@ function Checkout({ pack, go, onOpened }) {
             <input type="checkbox" checked={ack} onChange={(e) => setAck(e.target.checked)} />
             <span>
               {pack.id === "tier-quick"
-                ? "I understand the fee shown is for a 10-minute phone consultation providing general guidance about my situation, that no outcome is promised, and that no attorney-client relationship for representation is formed until a signed engagement letter and payment for an engagement are received."
+                ? "I understand the fee shown is for an initial consultation with the attorney providing general guidance about my situation, that no outcome is promised, and that no attorney-client relationship for representation is formed until a signed engagement letter and payment for an engagement are received."
                 : "I understand that representation begins when I sign the engagement letter Zayrov Law sends me and payment clears, that the fee shown is a flat fee for the selected engagement, and that no outcome is promised."}
             </span>
           </label>
@@ -392,7 +397,7 @@ function Checkout({ pack, go, onOpened }) {
           <button className="v-gold v-w100" onClick={toZelle} disabled={!infoReady}>Continue to payment</button>
           <p className="v-mutetext v-mt">
             {pack.id === "tier-quick"
-              ? "Pay, and we call you to set the ten minutes — same week, often same day."
+              ? "Pay, and we call you to schedule your consultation — same week, often same day."
               : "Your engagement letter follows by email. Representation begins on signed letter and cleared payment."}
           </p>
         </div>

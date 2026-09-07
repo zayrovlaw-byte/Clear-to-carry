@@ -30,6 +30,7 @@ export default function Ribbon() {
         <span className="v-ribbontag">{PROMO.eyebrow}</span>
         <span className="v-ribbonmsg">{PROMO.message}</span>
         <span className="v-ribboncta">{PROMO.cta} →</span>
+        <span className="v-ribbonfine">{PROMO.fine}</span>
       </Link>
       <button className="v-ribbonx" onClick={dismiss} aria-label="Dismiss">×</button>
     </div>

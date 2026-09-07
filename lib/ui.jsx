@@ -198,6 +198,27 @@ export function LicenseCard({ className }) {
   );
 }
 
+export function ClockIcon() {
+  return (
+    <svg className="v-cardicon" viewBox="0 0 64 64" aria-hidden="true">
+      <circle cx="32" cy="34" r="24" fill="rgba(227,166,79,0.08)" stroke="#E3A64F" strokeWidth="2.5" />
+      <path d="M32 20 V34 L42 40" fill="none" stroke="#E3A64F" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M22 8 L14 14 M42 8 L50 14" stroke="#A5732F" strokeWidth="2.5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+export function FileCheckIcon() {
+  return (
+    <svg className="v-cardicon" viewBox="0 0 64 64" aria-hidden="true">
+      <path d="M16 6 H38 L50 18 V58 H16 Z" fill="rgba(227,166,79,0.08)" stroke="#E3A64F" strokeWidth="2.5" strokeLinejoin="round" />
+      <path d="M38 6 V18 H50" fill="none" stroke="#A5732F" strokeWidth="2.2" strokeLinejoin="round" />
+      <path d="M23 30 H43 M23 38 H37" stroke="#A5732F" strokeWidth="2.2" strokeLinecap="round" />
+      <path d="M25 48 L31 53 L42 42" fill="none" stroke="#E3A64F" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 export function Nav() {
   return (
     <header className="v-nav">
