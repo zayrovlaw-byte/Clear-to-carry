@@ -7,6 +7,9 @@ body {
 body * { box-sizing: border-box; }
 body button { cursor: pointer; font-family: inherit; }
 body :focus-visible { outline: 1.5px solid #E3A64F; outline-offset: 3px; }
+::selection { background: #E3A64F; color: #150E08; }
+html { color-scheme: dark; scrollbar-color: #3B2A1D #150E08; }
+input, select, textarea { accent-color: #E3A64F; }
 
 .v-eyebrow {
   font-family: 'IBM Plex Mono', monospace; font-size: 10px;
@@ -15,8 +18,15 @@ body :focus-visible { outline: 1.5px solid #E3A64F; outline-offset: 3px; }
 }
 .v-rule { height: 1px; background: #3B2A1D; margin: 40px 0; }
 
-/* nav */
-.v-nav { border-bottom: 1px solid #3B2A1D; }
+/* nav — stays with the reader; blur keeps the page legible beneath it */
+.v-nav {
+  border-bottom: 1px solid #3B2A1D;
+  position: sticky; top: 0; z-index: 70;
+  background: rgba(21,14,8,0.82);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+}
+.v-navphone { color: #E3A64F; letter-spacing: 0.04em; white-space: nowrap; }
+.v-navphone:hover { color: #F0BE6C; }
 .v-navin {
   max-width: 960px; margin: 0 auto; padding: 18px 22px;
   display: flex; align-items: center; justify-content: space-between;
@@ -65,7 +75,8 @@ body :focus-visible { outline: 1.5px solid #E3A64F; outline-offset: 3px; }
   transition: background .15s;
   display: inline-block;
 }
-.v-gold:hover { background: #F0BE6C; }
+.v-gold { transition: background .15s, transform .12s; }
+.v-gold:hover { background: #F0BE6C; transform: translateY(-1px); }
 .v-gold:disabled { background: #A5732F; cursor: not-allowed; }
 .v-quiet {
   background: transparent; color: #F7EFE1; border: 1px solid #3B2A1D;
@@ -384,8 +395,9 @@ body :focus-visible { outline: 1.5px solid #E3A64F; outline-offset: 3px; }
 .v-packs { display: grid; grid-template-columns: 1fr; gap: 18px; margin-top: 40px; }
 .v-pack {
   border: 1px solid #3B2A1D; padding: 30px 26px; position: relative;
-  background: #211611; transition: border-color .15s;
+  background: #211611; transition: border-color .15s, transform .15s, box-shadow .15s;
 }
+.v-pack:hover { transform: translateY(-2px); box-shadow: 0 14px 30px rgba(0,0,0,0.3); }
 .v-pack:hover { border-color: #A5732F; }
 .v-packfeat { border-color: #E3A64F; }
 .v-featribbon {
@@ -536,7 +548,9 @@ body :focus-visible { outline: 1.5px solid #E3A64F; outline-offset: 3px; }
   border: 1px solid #3B2A1D; background: #211611; padding: 30px 20px 26px;
   transition: border-color .15s, transform .15s;
 }
-.v-license:hover { border-color: #E3A64F; transform: translateY(-2px); }
+.v-license:hover { border-color: #E3A64F; transform: translateY(-2px); box-shadow: 0 14px 30px rgba(0,0,0,0.35); }
+.v-license:hover .v-cardicon { filter: drop-shadow(0 0 9px rgba(227,166,79,0.4)); }
+.v-cardicon { transition: filter .2s; }
 .v-licensefeat { border-color: #A5732F; }
 .v-cardicon { width: 52px; height: 52px; margin: 0 auto 16px; display: block; }
 .v-licensename {

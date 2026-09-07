@@ -79,6 +79,14 @@ letter is an expensive way to save $50.
    NOTIFY_EMAIL in `.env`. Until then, notifications only print to the server log.
 7. Review `/privacy` wording.
 
+## Domain-bound settings
+
+The production domain is assumed to be cleartocarry.nyc in three places:
+`metadataBase` in `app/layout.jsx`, `app/sitemap.js`, and `app/robots.js`.
+Launching on a different domain means changing all three. The share card is
+`public/og.png` (regenerate if the brand changes); local-business structured
+data lives in `app/layout.jsx`.
+
 ## Deploy
 
 Needs a persistent disk (JSON storage + uploads), so use Railway, Render, or a
