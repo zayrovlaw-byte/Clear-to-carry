@@ -650,7 +650,7 @@ input, select, textarea { accent-color: #E3A64F; }
   background-image: url("/hero-nyc.jpg");
   background-image: -webkit-image-set(url("/hero-nyc.webp") type("image/webp"), url("/hero-nyc.jpg") type("image/jpeg"));
   background-image: image-set(url("/hero-nyc.webp") type("image/webp"), url("/hero-nyc.jpg") type("image/jpeg"));
-  background-size: cover; background-position: center 38%;
+  background-size: cover; background-position: center 26%;
   /* Keeps the colour but seats it in the brand's noir. */
   filter: saturate(0.92) contrast(1.04);
 }
@@ -753,15 +753,15 @@ input, select, textarea { accent-color: #E3A64F; }
 
 /* With a photograph in place the hero carries its own horizon, so it needs
    real height and a soft landing into the page below. */
-.v-heroshot { min-height: min(76vh, 660px); display: flex; align-items: center; }
+.v-heroshot { min-height: min(88vh, 780px); display: flex; align-items: center; }
 .v-heroshot .v-heroinner { padding-top: 64px; padding-bottom: 64px; width: 100%; }
 .v-heroshot .v-heroglow { display: none; }
 
 /* Narrow screens crop hard to centre, which lands on the figure and loses the
    city. Pull the focal point left, onto the skyline. */
 @media (max-width: 720px) {
-  .v-herophoto { background-position: 21% 42%; }
-  .v-heroshot { min-height: min(72vh, 560px); }
+  .v-herophoto { background-position: 26% 34%; }
+  .v-heroshot { min-height: min(78vh, 620px); }
   .v-navin { gap: 10px; }
   .v-navright { gap: 12px !important; }
   .v-navlink { font-size: 10.5px; letter-spacing: 0.06em; }
@@ -918,3 +918,20 @@ input, select, textarea { accent-color: #E3A64F; }
   text-transform: uppercase; color: #A8927C;
 }
 @media (min-width: 720px) { .v-whogrid { grid-template-columns: 1fr 1fr; } }
+
+/* screening result: one paid next step, no free bypass */
+.v-bookbox {
+  border: 1px solid #A5732F; background: rgba(227,166,79,0.05);
+  padding: 26px 24px; margin-top: 8px;
+}
+.v-bookhead {
+  font-family: 'Cormorant Garamond', serif; font-size: 21px; line-height: 1.4;
+  color: #F7EFE1; margin-bottom: 20px;
+}
+.v-bookfine {
+  font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; letter-spacing: 0.14em;
+  text-transform: uppercase; color: #A5732F; text-align: center; margin-top: 12px;
+}
+.v-bookalt { font-size: 13.5px; color: #A8927C; margin-top: 18px; }
+.v-goldlink { color: #E3A64F; text-decoration: none; border-bottom: 1px solid #A5732F; }
+.v-goldlink:hover { color: #F0BE6C; }

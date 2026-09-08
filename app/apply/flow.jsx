@@ -2,8 +2,8 @@
 import { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Eyebrow, LicenseIcon } from "@/lib/ui";
-import { PACKAGES, TIERS, QUALIFY, PHASES, THIRD_PARTY_COSTS, FEE_RANGE, ZELLE_TO, PHONE, PHONE_TEL } from "@/lib/content";
+import { Eyebrow, LicenseIcon, BookLink } from "@/lib/ui";
+import { PACKAGES, TIERS, QUALIFY, PHASES, THIRD_PARTY_COSTS, FEE_RANGE, BOOKING_URL, ZELLE_TO, PHONE, PHONE_TEL } from "@/lib/content";
 
 const GREEN = "#5FA97F", RED = "#D25A40", CHAMPAGNE = "#E3A64F";
 const fmt = (n) => "$" + n.toLocaleString();
@@ -70,31 +70,38 @@ function Qualify({ go }) {
   const light = reds.length ? "red" : yellows.length ? "yellow" : "green";
   const notes = [...reds, ...yellows].filter((p) => p.note);
 
-  async function saveLead() {
-    setErr("");
+  /* Records the screening answers so the attorney has them before the call,
+     then hands the visitor to payment. keepalive lets the POST finish even
+     though the booking link navigates away immediately. */
+  function recordScreening() {
     try {
-      await postJson("/api/lead", {
-        ...contact,
-        kind: "screening",
-        light,
-        answers: picked.map((p) => ({ id: p.id, answer: p.label })),
-      });
+      fetch("/api/lead", {
+        method: "POST",
+        keepalive: true,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...contact,
+          kind: "screening",
+          light,
+          answers: picked.map((p) => ({ id: p.id, answer: p.label })),
+        }),
+      }).catch(() => {});
       setSent(true);
-    } catch (e) {
-      setErr(e.message);
-    }
+    } catch {}
+  }
+
+  function startPaid() {
+    recordScreening();
+    go("quickcheckout");
   }
 
   const L = {
     green: { color: GREEN, badge: "CLEAR PATH", head: "Nothing stands in your way.",
-      body: "No bar and no complication showed up. You are the applicant this license now exists for. The only way to lose from here is a file with an avoidable error in it, and that is precisely what we prevent.",
-      cta: "packages", ctaLabel: "Choose your engagement" },
+      body: "No bar and no complication showed up. You are the applicant this licence now exists for. The only way to lose from here is a file with an avoidable error in it, and that is precisely what we prevent." },
     yellow: { color: CHAMPAGNE, badge: "QUALIFIED · WITH HANDLING", head: "You can get there. It has to be built right.",
-      body: "Nothing you flagged is an automatic bar. Every one of these items is the kind of thing that sinks a do-it-yourself application when an investigator finds it first, and survives when counsel presents it first. This is the exact file we are best at.",
-      cta: "consult", ctaLabel: "Talk to the attorney first, free" },
-    red: { color: RED, badge: "CALL BEFORE YOU FILE", head: "Do not file anything yet.",
-      body: "Something in your answers needs legal analysis before an application exists with your name on it. Filing wrong here can make things permanently worse. The conversation is free, and we will tell you plainly whether there is a path and what it costs.",
-      cta: null },
+      body: "Nothing you flagged is an automatic bar. Every one of these items is the kind of thing that sinks a do-it-yourself application when an investigator finds it first, and survives when counsel presents it first. This is the exact file we are best at." },
+    red: { color: RED, badge: "TALK BEFORE YOU FILE", head: "Do not file anything yet.",
+      body: "Something in your answers needs legal analysis before an application exists with your name on it. Filing wrong here can make things permanently worse. Book the consultation and the attorney will tell you plainly whether there is a path, and what it costs." },
   }[light];
 
   return (
@@ -109,33 +116,32 @@ function Qualify({ go }) {
           ))}
         </div>
       )}
-      {!sent ? (
-        <div className="v-leadbox">
-          <div className="v-leadhead">
-            {light === "green"
-              ? "Want your result and next steps by phone? One call, no obligation."
-              : "Leave your number. The attorney calls you, not an assistant."}
-          </div>
-          <Field label="Name" value={contact.name} onChange={(e) => setContact({ ...contact, name: e.target.value })} />
-          <Field label="Phone" inputMode="tel" value={contact.phone} onChange={(e) => setContact({ ...contact, phone: e.target.value })} />
-          {err && <p className="v-mutetext" style={{ color: RED }}>{err}</p>}
-          <button className="v-gold v-w100" onClick={saveLead} disabled={!contact.name.trim() || !contact.phone.trim()}>
-            Have the attorney call me
-          </button>
+      <div className="v-bookbox">
+        <div className="v-bookhead">
+          {light === "red"
+            ? "The next step is a conversation with the attorney, not a form."
+            : "Book your consultation and the attorney takes it from here."}
         </div>
-      ) : (
-        <div className="v-leadbox">
-          <div className="v-leadhead" style={{ color: GREEN }}>
-            Received. Expect a call from {PHONE} within one business day.
-          </div>
+        <BookLink className="v-gold v-w100" style={{ textAlign: "center" }}
+          onFallback={startPaid} onNavigate={recordScreening}>
+          Get started · $99
+        </BookLink>
+        <div className="v-bookfine">
+          Initial consultation with the attorney
+          {BOOKING_URL ? " · pick your time and pay in one step" : ""}
         </div>
-      )}
-      {L.cta && (
-        <button className="v-quiet v-w100 v-mt" onClick={() => go(L.cta)}>{L.ctaLabel}</button>
-      )}
-      {light === "red" && (
-        <a className="v-gold v-w100 v-mt" style={{ textAlign: "center" }} href={PHONE_TEL}>Call now · {PHONE}</a>
-      )}
+        {sent && (
+          <p className="v-mutetext" style={{ color: GREEN, marginTop: 14, marginBottom: 0 }}>
+            Your screening answers were sent to the attorney ahead of your consultation.
+          </p>
+        )}
+        {err && <p className="v-mutetext" style={{ color: RED, marginBottom: 0 }}>{err}</p>}
+      </div>
+
+      <div className="v-bookalt">
+        Questions before you book? Call <a className="v-goldlink" href={PHONE_TEL}>{PHONE}</a>.
+      </div>
+
       <p className="v-legal v-mt">
         This screening is general information, not legal advice, and creates no
         attorney-client relationship. Eligibility is determined by the licensing
@@ -185,7 +191,7 @@ function Packages({ go, choose, pickLicense }) {
               </button>
             )}
             {t.concierge && (
-              <button className="v-quiet v-w100" onClick={() => go("consult")}>Arrange by consultation</button>
+              <button className="v-quiet v-w100" onClick={() => go("quickcheckout")}>Start with a consultation</button>
             )}
           </div>
         ))}
@@ -217,8 +223,8 @@ function Packages({ go, choose, pickLicense }) {
       )}
 
       <div className="v-underpacks">
-        <p className="v-mutetext">Not certain where to start? The first phone call is free and the answer is honest.</p>
-        <button className="v-quiet" onClick={() => go("consult")}>Request free consultation</button>
+        <p className="v-mutetext">Not certain where to start? Book the consultation and the answer is honest.</p>
+        <BookLink className="v-quiet" onFallback={() => go("quickcheckout")}>Get started · $99</BookLink>
       </div>
     </div>
   );
@@ -271,78 +277,18 @@ function Fee({ lic, go, choose }) {
         </div>
       </div>
 
-      <button className="v-gold v-w100 v-mt" onClick={() => choose({ id: QUICK.id, name: QUICK.name, price: QUICK.price })}>
+      <BookLink className="v-gold v-w100 v-mt" style={{ textAlign: "center" }}
+        onFallback={() => choose({ id: QUICK.id, name: QUICK.name, price: QUICK.price })}>
         Not ready to commit? Get started for {fmt(QUICK.price)}
-      </button>
-      <button className="v-quiet v-w100 v-mt" onClick={() => go("consult")}>
-        Get my exact fee · free callback
-      </button>
+      </BookLink>
+      <BookLink className="v-quiet v-w100 v-mt" style={{ textAlign: "center" }}
+        onFallback={() => go("quickcheckout")}>
+        Get my exact fee · book the consultation
+      </BookLink>
       <p className="v-mutetext v-mt">
         Nothing is owed today. We quote your figure, send the engagement letter, and
         representation begins when it is signed and payment clears.
       </p>
-    </div>
-  );
-}
-
-/* ---------------- consult ---------------- */
-function Consult({ go }) {
-  const [f, setF] = useState({ name: "", phone: "", email: "", interest: "carry", note: "" });
-  const [sent, setSent] = useState(false);
-  const [err, setErr] = useState("");
-
-  async function submit() {
-    setErr("");
-    try {
-      await postJson("/api/lead", { ...f, kind: "consult" });
-      setSent(true);
-    } catch (e) {
-      setErr(e.message);
-    }
-  }
-
-  if (sent) {
-    return (
-      <div className="v-page v-narrow">
-        <Eyebrow>Received</Eyebrow>
-        <h1 className="v-h1 v-h1sm">We&apos;ll call you.</h1>
-        <p className="v-lede v-ledesm">
-          Your request is in. Expect a call from {PHONE} within one business day. If
-          you&apos;d rather not wait, call us directly.
-        </p>
-        <a className="v-gold v-inline" href={PHONE_TEL}>Call now</a>
-      </div>
-    );
-  }
-
-  return (
-    <div className="v-page v-narrow">
-      <Eyebrow>Complimentary</Eyebrow>
-      <h1 className="v-h1 v-h1sm">A private conversation.</h1>
-      <p className="v-lede v-ledesm">
-        Fifteen minutes with the attorney. You&apos;ll leave knowing whether you
-        qualify, which license fits, and what it costs. No obligation, no file opened.
-      </p>
-      <div className="v-form">
-        <Field label="Name" value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} />
-        <Field label="Phone" inputMode="tel" value={f.phone} onChange={(e) => setF({ ...f, phone: e.target.value })} />
-        <Field label="Email (optional)" inputMode="email" value={f.email} onChange={(e) => setF({ ...f, email: e.target.value })} />
-        <label className="v-field">
-          <span className="v-fieldlabel">I&apos;m interested in protecting</span>
-          <select className="v-input" value={f.interest} onChange={(e) => setF({ ...f, interest: e.target.value })}>
-            <option value="home">My home</option>
-            <option value="business">My business</option>
-            <option value="carry">Myself, wherever I go</option>
-            <option value="unsure">Not sure yet</option>
-          </select>
-        </label>
-        <Field label="Anything we should know (optional)" area value={f.note} onChange={(e) => setF({ ...f, note: e.target.value })} />
-        {err && <p className="v-mutetext" style={{ color: RED }}>{err}</p>}
-        <button className="v-gold v-w100" onClick={submit} disabled={!f.name.trim() || !f.phone.trim()}>
-          Request my consultation
-        </button>
-        <p className="v-mutetext v-mt">Submitting this form does not create an attorney-client relationship.</p>
-      </div>
     </div>
   );
 }
@@ -665,6 +611,12 @@ export default function Flow() {
 
   const go = (v) => {
     if (v === "portal" && !clientId) return setView("packages");
+    if (v === "quickcheckout") {
+      setPack({ id: QUICK.id, name: QUICK.name, price: QUICK.price });
+      setView("checkout");
+      window.scrollTo(0, 0);
+      return;
+    }
     setView(v);
     window.scrollTo(0, 0);
   };
@@ -679,7 +631,6 @@ export default function Flow() {
       {view === "qualify" && <Qualify go={go} />}
       {view === "packages" && packagesView}
       {view === "fee" && (lic ? <Fee lic={lic} go={go} choose={choose} /> : packagesView)}
-      {view === "consult" && <Consult go={go} />}
       {view === "checkout" && (pack ? <Checkout pack={pack} go={go} onOpened={openPortal} /> : packagesView)}
       {view === "portal" && (clientId ? <Portal clientId={clientId} go={go} /> : packagesView)}
     </>

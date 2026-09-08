@@ -41,6 +41,31 @@ separate crest. Three typefaces total and no more: Cormorant Garamond for
 display, Inter for body, IBM Plex Mono for labels and eyebrows. Adding a
 fourth is how a brand stops looking like one.
 
+## Booking and payment
+
+Every "Get started · $99" button on the site routes through one switch:
+
+    NEXT_PUBLIC_BOOKING_URL
+
+**Set it** to a scheduling link that collects the fee at booking — Calendly with
+Stripe/PayPal on a paid event type, Booksy, Acuity, Square Appointments — and
+every button opens that page, where the client picks a time and pays in one
+step. The screening answers are still POSTed to /api/lead first, so the matter
+is in your inbox before the call.
+
+**Leave it empty** and the buttons fall back to the site's own checkout: contact
+details, an acknowledgement, then Zelle instructions with a memo reference you
+match in your bank app. Nothing breaks; it is just manual scheduling.
+
+Setting up Calendly + Stripe takes about fifteen minutes: create a $99 event
+type, connect Stripe under Payments, copy the event link, paste it into the env
+var. Change the price in Calendly and in `TIERS` in `lib/content.js` together —
+the site does not read Calendly's price.
+
+There is no free-consultation path anywhere in the funnel by design. The
+screening ends on the paid booking; the office phone number stays visible in the
+nav and under the screening result for people who would rather call.
+
 ## Hero photograph
 
 The hero is built to take a real colour photograph. Drop a licensed image at

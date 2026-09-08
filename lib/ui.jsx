@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { PHONE, PHONE_TEL } from "@/lib/content";
+import { PHONE, PHONE_TEL, BOOKING_URL } from "@/lib/content";
 import Ribbon from "@/lib/ribbon";
 
 /* ---- Brand: CLEAR TO CARRY over a ghosted 2, underlined.
@@ -216,6 +216,26 @@ export function FileCheckIcon() {
       <path d="M23 30 H43 M23 38 H37" stroke="#A5732F" strokeWidth="2.2" strokeLinecap="round" />
       <path d="M25 48 L31 53 L42 42" fill="none" stroke="#E3A64F" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
+  );
+}
+
+/* One button for "start and pay". With a scheduler configured it is a link
+   straight to the booking page; without one it falls back to whatever the
+   caller passes as `onFallback` (the site's own checkout). */
+export function BookLink({ children, className = "v-gold", onFallback, onNavigate, style }) {
+  if (BOOKING_URL) {
+    return (
+      <a className={className} style={style} href={BOOKING_URL}
+        target="_blank" rel="noopener noreferrer"
+        onClick={() => { if (onNavigate) onNavigate(); }}>
+        {children}
+      </a>
+    );
+  }
+  return (
+    <button className={className} style={style} onClick={onFallback} type="button">
+      {children}
+    </button>
   );
 }
 
