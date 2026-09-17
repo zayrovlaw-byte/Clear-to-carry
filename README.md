@@ -27,6 +27,29 @@ Open http://localhost:3000
 - `lib/content.js`  ALL copy, prices, questionnaire, phases. Edit prices here.
 - `data/`           leads.json, clients.json, uploads/ (gitignored)
 
+## Languages
+
+English at `/`, Spanish at `/es`, Russian at `/ru` — real pages, not a
+translate widget, so each one is separately indexable and carries hreflang
+tags pointing at its siblings.
+
+- `lib/schema.js` holds the structure: ids, prices, icons, screening grades.
+  It exists once, so a price or a grade can never drift between languages.
+- `lib/locales/{en,es,ru}.js` hold only text, keyed by those same ids.
+- `lib/i18n.js` merges the two and is the single entry point: `getDict(lang)`.
+- `lp(lang, path)` builds locale-correct links; the switcher in the nav keeps
+  the reader on the same page when they change language.
+
+**To change copy, edit all three locale files.** They must keep identical keys.
+To add a language: add a file under `lib/locales`, register it in `LOCALES` and
+`LOCALE_LABELS` in `lib/i18n.js`, and the routes, sitemap and hreflang follow
+automatically.
+
+**The translations need a native-speaker review before launch**, especially the
+disclaimers in `footer.legal`, `resultsDisclaimer` and the checkout
+acknowledgements. They are accurate, but a lawyer's advertising copy in another
+language should be read by someone who practises in it.
+
 ## Brand
 
 Scheme: espresso ground (#150E08), hot amber accent (#E3A64F), and a flame

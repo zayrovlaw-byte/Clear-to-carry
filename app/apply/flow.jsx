@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Eyebrow, LicenseIcon, BookLink } from "@/lib/ui";
-import { PACKAGES, TIERS, QUALIFY, PHASES, THIRD_PARTY_COSTS, FEE_RANGE, BOOKING_URL, ZELLE_TO, PHONE, PHONE_TEL } from "@/lib/content";
+import { BOOKING_URL, ZELLE_TO, PHONE, PHONE_TEL } from "@/lib/content";
 
 const GREEN = "#5FA97F", RED = "#D25A40", CHAMPAGNE = "#E3A64F";
 const fmt = (n) => "$" + n.toLocaleString();
@@ -29,7 +29,8 @@ async function postJson(url, body, method = "POST") {
 }
 
 /* ---------------- qualify ---------------- */
-function Qualify({ go }) {
+function Qualify({ go, t }) {
+  const QUALIFY = t.qualify;
   const [i, setI] = useState(0);
   const [picked, setPicked] = useState([]);
   const [contact, setContact] = useState({ name: "", phone: "" });
@@ -50,7 +51,7 @@ function Qualify({ go }) {
   if (!doneAll) {
     return (
       <div className="v-page v-narrow">
-        <Eyebrow>Do you qualify · {i + 1} of {QUALIFY.length}</Eyebrow>
+        <Eyebrow>{t.apply.qEyebrow} · {i + 1} {t.apply.qOf} {QUALIFY.length}</Eyebrow>
         <div className="v-track" style={{ marginBottom: 34 }}>
           <div className="v-fill" style={{ width: (i / QUALIFY.length) * 100 + "%" }} />
         </div>
@@ -60,7 +61,7 @@ function Qualify({ go }) {
             <button className="v-qopt" key={k} onClick={() => pick(o)}>{o.label}</button>
           ))}
         </div>
-        <p className="v-mutetext v-mt">Nothing here is filed or shared. Honest answers get you an honest read.</p>
+        <p className="v-mutetext v-mt">{t.apply.qFoot}</p>
       </div>
     );
   }
@@ -96,12 +97,9 @@ function Qualify({ go }) {
   }
 
   const L = {
-    green: { color: GREEN, badge: "CLEAR PATH", head: "Nothing stands in your way.",
-      body: "No bar and no complication showed up. You are the applicant this licence now exists for. The only way to lose from here is a file with an avoidable error in it, and that is precisely what we prevent." },
-    yellow: { color: CHAMPAGNE, badge: "QUALIFIED · WITH HANDLING", head: "You can get there. It has to be built right.",
-      body: "Nothing you flagged is an automatic bar. Every one of these items is the kind of thing that sinks a do-it-yourself application when an investigator finds it first, and survives when counsel presents it first. This is the exact file we are best at." },
-    red: { color: RED, badge: "TALK BEFORE YOU FILE", head: "Do not file anything yet.",
-      body: "Something in your answers needs legal analysis before an application exists with your name on it. Filing wrong here can make things permanently worse. Book the consultation and the attorney will tell you plainly whether there is a path, and what it costs." },
+    green: { color: GREEN, badge: t.apply.resultGreenBadge, head: t.apply.resultGreenHead, body: t.apply.resultGreenBody },
+    yellow: { color: CHAMPAGNE, badge: t.apply.resultYellowBadge, head: t.apply.resultYellowHead, body: t.apply.resultYellowBody },
+    red: { color: RED, badge: t.apply.resultRedBadge, head: t.apply.resultRedHead, body: t.apply.resultRedBody },
   }[light];
 
   return (
@@ -119,33 +117,31 @@ function Qualify({ go }) {
       <div className="v-bookbox">
         <div className="v-bookhead">
           {light === "red"
-            ? "The next step is a conversation with the attorney, not a form."
-            : "Book your consultation and the attorney takes it from here."}
+            ? t.apply.bookHeadRed
+            : t.apply.bookHead}
         </div>
         <BookLink className="v-gold v-w100" style={{ textAlign: "center" }}
           onFallback={startPaid} onNavigate={recordScreening}>
-          Get started · $99
+          {t.common.getStarted99}
         </BookLink>
         <div className="v-bookfine">
-          Initial consultation with the attorney
-          {BOOKING_URL ? " · pick your time and pay in one step" : ""}
+          {t.apply.bookFine}
+          {BOOKING_URL ? t.apply.bookFineScheduler : ""}
         </div>
         {sent && (
           <p className="v-mutetext" style={{ color: GREEN, marginTop: 14, marginBottom: 0 }}>
-            Your screening answers were sent to the attorney ahead of your consultation.
+            {t.apply.bookSent}
           </p>
         )}
         {err && <p className="v-mutetext" style={{ color: RED, marginBottom: 0 }}>{err}</p>}
       </div>
 
       <div className="v-bookalt">
-        Questions before you book? Call <a className="v-goldlink" href={PHONE_TEL}>{PHONE}</a>.
+        {t.apply.bookAltPre}<a className="v-goldlink" href={PHONE_TEL}>{PHONE}</a>.
       </div>
 
       <p className="v-legal v-mt">
-        This screening is general information, not legal advice, and creates no
-        attorney-client relationship. Eligibility is determined by the licensing
-        authority on your complete record.
+        {t.apply.screeningLegal}
       </p>
     </div>
   );
@@ -154,44 +150,43 @@ function Qualify({ go }) {
 /* ---------------- packages ----------------
    Deliberately price-free. The fee is disclosed on the Fee step, one click
    from checkout, so the visitor chooses the engagement on its merits first. */
-function Packages({ go, choose, pickLicense }) {
+function Packages({ go, choose, pickLicense, t }) {
+  const TIERS = t.tiers, PACKAGES = t.packages;
   const [showLicenses, setShowLicenses] = useState(false);
   return (
     <div className="v-page">
-      <Eyebrow>Engagements</Eyebrow>
-      <h1 className="v-h1 v-h1sm">Choose how much of this you want to carry.</h1>
+      <Eyebrow>{t.apply.packagesEyebrow}</Eyebrow>
+      <h1 className="v-h1 v-h1sm">{t.apply.packagesH1}</h1>
       <p className="v-lede v-ledesm">
-        Every level is a flat fee, fixed in writing, and handled personally by the
-        attorney. Most clients choose Full Representation. Some want an hour of
-        straight answers first. Both are the right way in.
+        {t.apply.packagesLede}
       </p>
       <div className="v-tiers">
-        {TIERS.map((t) => (
-          <div key={t.id} className={"v-pack v-tier" + (t.featured ? " v-packfeat" : "")}>
-            {t.featured && <div className="v-featribbon">Most engaged</div>}
-            <div className="v-packtier">{t.tier}</div>
-            <div className="v-packname">{t.name}</div>
-            {t.quick && (
+        {TIERS.map((tier) => (
+          <div key={tier.id} className={"v-pack v-tier" + (tier.featured ? " v-packfeat" : "")}>
+            {tier.featured && <div className="v-featribbon">{t.apply.mostEngaged}</div>}
+            <div className="v-packtier">{tier.tier}</div>
+            <div className="v-packname">{tier.name}</div>
+            {tier.quick && (
               <div>
-                <div className="v-packprice">{fmt(t.price)}</div>
-                <div className="v-packfine">{t.fine}</div>
+                <div className="v-packprice">{fmt(tier.price)}</div>
+                <div className="v-packfine">{tier.fine}</div>
               </div>
             )}
-            <p className="v-packline">{t.line}</p>
-            <p className="v-packfor">{t.for}</p>
-            {t.checkout && (
-              <button className={t.quick ? "v-gold v-w100" : "v-quiet v-w100"}
-                onClick={() => choose({ id: t.id, name: t.name, price: t.price })}>
-                {t.quick ? "Get started now" : "Continue"}
+            <p className="v-packline">{tier.line}</p>
+            <p className="v-packfor">{tier.for}</p>
+            {tier.checkout && (
+              <button className={tier.quick ? "v-gold v-w100" : "v-quiet v-w100"}
+                onClick={() => choose({ id: tier.id, name: tier.name, price: tier.price })}>
+                {tier.quick ? t.apply.getStartedNow : t.apply.continue}
               </button>
             )}
-            {t.expands && (
+            {tier.expands && (
               <button className="v-gold v-w100" onClick={() => setShowLicenses((v) => !v)}>
-                {showLicenses ? "Hide licence types" : "Choose your licence type"}
+                {showLicenses ? t.apply.hideLicence : t.apply.chooseLicence}
               </button>
             )}
-            {t.concierge && (
-              <button className="v-quiet v-w100" onClick={() => go("quickcheckout")}>Start with a consultation</button>
+            {tier.concierge && (
+              <button className="v-quiet v-w100" onClick={() => go("quickcheckout")}>{t.apply.startConsult}</button>
             )}
           </div>
         ))}
@@ -199,23 +194,22 @@ function Packages({ go, choose, pickLicense }) {
 
       {showLicenses && (
         <div className="v-licenseblock">
-          <div className="v-licensehead"><Eyebrow>Full Representation · choose your licence</Eyebrow></div>
+          <div className="v-licensehead"><Eyebrow>{t.apply.licenceBlockEyebrow}</Eyebrow></div>
           <p className="v-mutetext" style={{ maxWidth: "62ch" }}>
-            Every licence below is handled for the same flat fee. What moves the
-            number is your record, not which licence you want.
+            {t.apply.licenceBlockNote}
           </p>
           <div className="v-packs">
             {PACKAGES.map((p) => (
               <button key={p.id}
                 className={"v-pack v-packbtn" + (p.featured ? " v-packfeat" : "")}
                 onClick={() => pickLicense(p)}>
-                {p.featured && <div className="v-featribbon">Flagship</div>}
+                {p.featured && <div className="v-featribbon">{t.apply.flagship}</div>}
                 <LicenseIcon name={p.icon} />
                 <div className="v-packtier">{p.tier}</div>
                 <div className="v-packname">{p.name}</div>
                 <p className="v-packline">{p.line}</p>
                 <p className="v-packfor">{p.for}</p>
-                <span className={p.featured ? "v-gold v-w100 v-faux" : "v-quiet v-w100 v-faux"}>Continue</span>
+                <span className={p.featured ? "v-gold v-w100 v-faux" : "v-quiet v-w100 v-faux"}>{t.apply.continue}</span>
               </button>
             ))}
           </div>
@@ -223,8 +217,8 @@ function Packages({ go, choose, pickLicense }) {
       )}
 
       <div className="v-underpacks">
-        <p className="v-mutetext">Not certain where to start? Book the consultation and the answer is honest.</p>
-        <BookLink className="v-quiet" onFallback={() => go("quickcheckout")}>Get started · $99</BookLink>
+        <p className="v-mutetext">{t.apply.underPacks}</p>
+        <BookLink className="v-quiet" onFallback={() => go("quickcheckout")}>{t.common.getStarted99}</BookLink>
       </div>
     </div>
   );
@@ -233,32 +227,27 @@ function Packages({ go, choose, pickLicense }) {
 /* ---------------- fee ----------------
    Where price finally appears: one click from checkout, after the visitor has
    picked a licence. Shows the band, what moves it, and the third-party costs. */
-function Fee({ lic, go, choose }) {
+function Fee({ lic, go, choose, t }) {
+  const THIRD_PARTY_COSTS = t.thirdParty, FEE_RANGE = t.feeRange;
   return (
     <div className="v-page v-mid">
-      <button className="v-back" onClick={() => go("packages")}>← Engagements</button>
-      <Eyebrow>Your engagement · {lic.name}</Eyebrow>
-      <h1 className="v-h1 v-h1sm">What this costs.</h1>
+      <button className="v-back" onClick={() => go("packages")}>{t.apply.backEngagements}</button>
+      <Eyebrow>{t.apply.feeEyebrow} · {lic.name}</Eyebrow>
+      <h1 className="v-h1 v-h1sm">{t.apply.feeH1}</h1>
 
       <div className="v-feebox">
-        <div className="v-feelabel">Full Representation · flat fee</div>
+        <div className="v-feelabel">{t.apply.feeLabel}</div>
         <div className="v-feefigure">{FEE_RANGE}</div>
         <p className="v-feenote">
-          Where you land in that band is set by your record, not by your licence. A
-          clean, straightforward file sits at the bottom. A file that needs real
-          legal work sits higher. We tell you your exact figure at the consultation
-          and fix it in writing in the engagement letter before any work begins.
+          {t.apply.feeNote}
         </p>
       </div>
 
       <div className="v-costs" style={{ marginTop: 34 }}>
-        <Eyebrow>What else this costs</Eyebrow>
-        <h2 className="v-h2" style={{ marginBottom: 14 }}>Three fees that are not ours.</h2>
+        <Eyebrow>{t.apply.costsEyebrow}</Eyebrow>
+        <h2 className="v-h2" style={{ marginBottom: 14 }}>{t.apply.costsH2}</h2>
         <p className="v-mutetext" style={{ maxWidth: "62ch", marginBottom: 22 }}>
-          Every applicant pays these, with or without an attorney. They go to the
-          City, the State, and your course provider, never to this firm. Amounts are
-          set by them and change, so we confirm current figures at your consultation
-          rather than advertise a number that may be stale when you read it.
+          {t.apply.costsLede}
         </p>
         <div className="v-costlist">
           {THIRD_PARTY_COSTS.map((c) => (
@@ -271,30 +260,28 @@ function Fee({ lic, go, choose }) {
         <div className="v-costincluded">
           <span className="v-costincludedmark" aria-hidden="true">✓</span>
           <span>
-            All three are <strong>included in the Concierge engagement</strong>. In every
-            other engagement you pay them directly to the third party.
+            {t.apply.costsIncludedPre}<strong>{t.apply.costsIncluded}</strong>{t.apply.costsIncludedPost}
           </span>
         </div>
       </div>
 
       <BookLink className="v-gold v-w100 v-mt" style={{ textAlign: "center" }}
         onFallback={() => choose({ id: QUICK.id, name: QUICK.name, price: QUICK.price })}>
-        Not ready to commit? Get started for {fmt(QUICK.price)}
+        {t.apply.feeNotReady} {fmt(QUICK.price)}
       </BookLink>
       <BookLink className="v-quiet v-w100 v-mt" style={{ textAlign: "center" }}
         onFallback={() => go("quickcheckout")}>
-        Get my exact fee · book the consultation
+        {t.apply.feeExact}
       </BookLink>
       <p className="v-mutetext v-mt">
-        Nothing is owed today. We quote your figure, send the engagement letter, and
-        representation begins when it is signed and payment clears.
+        {t.apply.feeFoot}
       </p>
     </div>
   );
 }
 
 /* ---------------- checkout ---------------- */
-function Checkout({ pack, go, onOpened }) {
+function Checkout({ pack, go, onOpened, t }) {
   const [f, setF] = useState({ name: "", phone: "", email: "" });
   const [ack, setAck] = useState(false);
   const [step, setStep] = useState("info");
@@ -321,30 +308,30 @@ function Checkout({ pack, go, onOpened }) {
 
   return (
     <div className="v-page v-narrow">
-      <button className="v-back" onClick={() => go("packages")}>← Engagements</button>
-      <Eyebrow>Retain counsel</Eyebrow>
+      <button className="v-back" onClick={() => go("packages")}>{t.apply.backEngagements}</button>
+      <Eyebrow>{t.apply.checkoutEyebrow}</Eyebrow>
       <h1 className="v-h1 v-h1sm">{pack.name}</h1>
-      <div className="v-checkprice">{fmt(pack.price)} <span className="v-checkflat">{pack.id === "tier-quick" ? "initial consultation" : "flat fee"}</span></div>
+      <div className="v-checkprice">{fmt(pack.price)} <span className="v-checkflat">{pack.id === "tier-quick" ? t.apply.initialConsultation : t.apply.flatFee}</span></div>
 
       {step === "info" && (
         <div className="v-form">
-          <Field label="Full legal name" value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} />
-          <Field label="Phone" inputMode="tel" value={f.phone} onChange={(e) => setF({ ...f, phone: e.target.value })} />
-          <Field label="Email" inputMode="email" value={f.email} onChange={(e) => setF({ ...f, email: e.target.value })} />
+          <Field label={t.apply.fullName} value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} />
+          <Field label={t.apply.phone} inputMode="tel" value={f.phone} onChange={(e) => setF({ ...f, phone: e.target.value })} />
+          <Field label={t.apply.email} inputMode="email" value={f.email} onChange={(e) => setF({ ...f, email: e.target.value })} />
           <label className="v-ack">
             <input type="checkbox" checked={ack} onChange={(e) => setAck(e.target.checked)} />
             <span>
               {pack.id === "tier-quick"
-                ? "I understand the fee shown is for an initial consultation with the attorney providing general guidance about my situation, that no outcome is promised, and that no attorney-client relationship for representation is formed until a signed engagement letter and payment for an engagement are received."
-                : "I understand that representation begins when I sign the engagement letter Zayrov Law sends me and payment clears, that the fee shown is a flat fee for the selected engagement, and that no outcome is promised."}
+                ? t.apply.ackQuick
+                : t.apply.ackFull}
             </span>
           </label>
           {err && <p className="v-mutetext" style={{ color: RED }}>{err}</p>}
-          <button className="v-gold v-w100" onClick={toZelle} disabled={!infoReady}>Continue to payment</button>
+          <button className="v-gold v-w100" onClick={toZelle} disabled={!infoReady}>{t.apply.toPayment}</button>
           <p className="v-mutetext v-mt">
             {pack.id === "tier-quick"
-              ? "Pay, and we call you to schedule your consultation — same week, often same day."
-              : "Your engagement letter follows by email. Representation begins on signed letter and cleared payment."}
+              ? t.apply.afterQuick
+              : t.apply.afterFull}
           </p>
         </div>
       )}
@@ -352,19 +339,17 @@ function Checkout({ pack, go, onOpened }) {
       {step === "zelle" && created && (
         <div className="v-zelle">
           <div className="v-zellecard">
-            <div className="v-zellehead">Pay by Zelle</div>
-            <div className="v-zellerow"><span className="v-zellelabel">Send to</span><span className="v-zelleval">{ZELLE_TO}</span></div>
-            <div className="v-zellerow"><span className="v-zellelabel">Amount</span><span className="v-zelleval">{fmt(pack.price)}</span></div>
-            <div className="v-zellerow"><span className="v-zellelabel">Memo</span><span className="v-zelleval">{created.ref}</span></div>
+            <div className="v-zellehead">{t.apply.zelleHead}</div>
+            <div className="v-zellerow"><span className="v-zellelabel">{t.apply.zelleTo}</span><span className="v-zelleval">{ZELLE_TO}</span></div>
+            <div className="v-zellerow"><span className="v-zellelabel">{t.apply.zelleAmount}</span><span className="v-zelleval">{fmt(pack.price)}</span></div>
+            <div className="v-zellerow"><span className="v-zellelabel">{t.apply.zelleMemo}</span><span className="v-zelleval">{created.ref}</span></div>
             <p className="v-zellenote">
-              Open your banking app, send via Zelle to the address above, and include
-              the memo so we match your payment instantly. Prefer to split it or pay
-              another way? Call {PHONE}.
+              {t.apply.zelleNote} {PHONE}.
             </p>
           </div>
-          <button className="v-gold v-w100" onClick={() => onOpened(created.id)}>I&apos;ve sent payment · open my portal</button>
-          <button className="v-quiet v-w100 v-mt" onClick={() => onOpened(created.id)}>I&apos;ll pay after my engagement letter · open portal</button>
-          <p className="v-mutetext v-mt">Portal access is provisional until payment clears and your engagement letter is signed.</p>
+          <button className="v-gold v-w100" onClick={() => onOpened(created.id)}>{t.apply.zelleOpen}</button>
+          <button className="v-quiet v-w100 v-mt" onClick={() => onOpened(created.id)}>{t.apply.zelleLater}</button>
+          <p className="v-mutetext v-mt">{t.apply.zelleProvisional}</p>
         </div>
       )}
     </div>
@@ -372,7 +357,8 @@ function Checkout({ pack, go, onOpened }) {
 }
 
 /* ---------------- portal ---------------- */
-function Portal({ clientId, go }) {
+function Portal({ clientId, go, t }) {
+  const PHASES = t.phases;
   const [c, setC] = useState(null);
   const [err, setErr] = useState("");
   const fileInputRef = useRef(null);
@@ -383,11 +369,11 @@ function Portal({ clientId, go }) {
     fetch("/api/client?id=" + encodeURIComponent(clientId))
       .then((r) => r.json())
       .then((d) => (d.error ? setErr(d.error) : setC(d)))
-      .catch(() => setErr("Could not load your file. Call us."));
+      .catch(() => setErr(t.apply.portalLoadErr));
   }, [clientId]);
 
   if (err) return <div className="v-page v-narrow"><p className="v-lede v-ledesm">{err}</p></div>;
-  if (!c) return <div className="v-page v-narrow"><p className="v-mutetext">Opening your file…</p></div>;
+  if (!c) return <div className="v-page v-narrow"><p className="v-mutetext">{t.apply.portalOpening}</p></div>;
 
   const currentPhase = PHASES.find((p) => p.id === c.phase) || PHASES[PHASES.length - 1];
   const phaseItems = currentPhase.items;
@@ -442,20 +428,20 @@ function Portal({ clientId, go }) {
         accept=".pdf,.jpg,.jpeg,.png,.heic,.heif,.webp" />
       <div className="v-portalhead">
         <div>
-          <Eyebrow>Private client portal</Eyebrow>
-          <h1 className="v-h1 v-h1sm">{c.name.split(" ")[0]}, your file is open.</h1>
+          <Eyebrow>{t.apply.portalEyebrow}</Eyebrow>
+          <h1 className="v-h1 v-h1sm">{c.name.split(" ")[0]}, {t.apply.portalFileOpen}</h1>
           <div className="v-portalmeta">
-            {c.packageName} · Ref {c.ref} ·{" "}
+            {c.packageName} · {t.apply.portalRef} {c.ref} ·{" "}
             {c.paymentVerified
-              ? <span style={{ color: GREEN }}>Retainer received</span>
-              : <span style={{ color: CHAMPAGNE }}>Payment pending verification</span>}
+              ? <span style={{ color: GREEN }}>{t.apply.portalPaid}</span>
+              : <span style={{ color: CHAMPAGNE }}>{t.apply.portalPending}</span>}
           </div>
         </div>
       </div>
 
       <div className="v-progressblock">
         <div className="v-progresslabel">
-          <span>Movement {ROMAN[c.phase - 1]} of IV · {currentPhase.name}</span>
+          <span>{t.apply.portalMovement} {ROMAN[c.phase - 1]} {t.apply.portalOf} · {currentPhase.name}</span>
           <span>{overallPct}%</span>
         </div>
         <div className="v-track"><div className="v-fill" style={{ width: overallPct + "%" }} /></div>
@@ -478,46 +464,44 @@ function Portal({ clientId, go }) {
               <div className="v-docinfo">
                 <div className="v-doclabel">{it.label}</div>
                 {doc
-                  ? <div className="v-docstatus" style={{ color: GREEN }}>Received · {doc.name} · under attorney review</div>
-                  : <div className="v-docstatus">Awaiting your upload</div>}
+                  ? <div className="v-docstatus" style={{ color: GREEN }}>{t.apply.portalReceived} · {doc.name} · {t.apply.portalUnderReview}</div>
+                  : <div className="v-docstatus">{t.apply.portalAwaiting}</div>}
               </div>
               {doc
-                ? <button className="v-quiet v-sm" disabled={busy} onClick={() => pickFile(it.id)}>Replace</button>
-                : <button className="v-gold v-sm" disabled={busy} onClick={() => pickFile(it.id)}>{busy && pendingItem === it.id ? "Sending…" : "Upload"}</button>}
+                ? <button className="v-quiet v-sm" disabled={busy} onClick={() => pickFile(it.id)}>{t.apply.portalReplace}</button>
+                : <button className="v-gold v-sm" disabled={busy} onClick={() => pickFile(it.id)}>{busy && pendingItem === it.id ? t.apply.portalSending : t.apply.portalUpload}</button>}
             </div>
           );
         })}
         {phaseComplete && c.phase < PHASES.length && (
           <div className="v-phasedonebox">
             <p className="v-phasedonetext">
-              {currentPhase.name} is complete. The attorney reviews what you&apos;ve
-              sent, then the next movement opens.
+              {currentPhase.name} {t.apply.portalPhaseDone}
             </p>
-            <button className="v-gold" onClick={advance}>Open Movement {ROMAN[c.phase]}</button>
+            <button className="v-gold" onClick={advance}>{t.apply.portalOpenNext} {ROMAN[c.phase]}</button>
           </div>
         )}
         {phaseComplete && c.phase === PHASES.length && (
           <div className="v-phasedonebox">
             <p className="v-phasedonetext" style={{ color: GREEN }}>
-              Your file is assembled. We schedule your final review, then we file.
-              From here, we do the waiting for you.
+              {t.apply.portalAssembled}
             </p>
             {!c.filedAt && (
-              <button className="v-gold" onClick={markFiled}>Demo: mark as filed</button>
+              <button className="v-gold" onClick={markFiled}>{t.apply.portalMarkFiled}</button>
             )}
           </div>
         )}
       </div>
 
       {c.filedAt && (() => {
-        const STAGES = ["Filed with the License Division", "Under investigation", "Interview", "Decision"];
+        const STAGES = t.apply.trackerStages;
         const stage = c.appStatus || 0;
         const days = Math.floor((Date.now() - new Date(c.filedAt).getTime()) / 86400000);
         const remaining = 180 - days;
         const overdue = remaining <= 0;
         return (
           <div className="v-trackercard">
-            <div className="v-trackerhead"><Eyebrow>After filing · we watch, you live your life</Eyebrow></div>
+            <div className="v-trackerhead"><Eyebrow>{t.apply.trackerEyebrow}</Eyebrow></div>
             <div className="v-stages">
               {STAGES.map((s, k) => (
                 <div key={k} className={"v-stage" + (k < stage ? " v-stagedone" : k === stage ? " v-stagenow" : "")}>
@@ -526,28 +510,24 @@ function Portal({ clientId, go }) {
               ))}
             </div>
             <div className="v-clock">
-              <div className="v-clockdays" style={{ color: overdue ? RED : CHAMPAGNE }}>Day {days}</div>
+              <div className="v-clockdays" style={{ color: overdue ? RED : CHAMPAGNE }}>{t.apply.trackerDay} {days}</div>
               <div className="v-clocklabel">
                 {overdue
-                  ? "The statutory deadline has passed."
-                  : `of the 180 days the law gives the NYPD to decide. ${remaining} remain.`}
+                  ? t.apply.trackerOverdue
+                  : `${t.apply.trackerOf180} ${remaining} ${t.apply.trackerRemain}`}
               </div>
             </div>
             {overdue && (
               <div className="v-art78">
-                <div className="v-art78head">The law is now on our side of the table.</div>
+                <div className="v-art78head">{t.apply.art78Head}</div>
                 <p className="v-art78text">
-                  New York law required a decision on your complete application within
-                  six months. That deadline has passed. You don&apos;t have to keep
-                  waiting politely, and neither do we. An Article 78 proceeding asks a
-                  court to order the NYPD to decide. Call us to discuss it.
+                  {t.apply.art78Text}
                 </p>
-                <a className="v-gold v-sm" href={PHONE_TEL}>Discuss Article 78 · {PHONE}</a>
+                <a className="v-gold v-sm" href={PHONE_TEL}>{t.apply.art78Cta} {PHONE}</a>
               </div>
             )}
             <p className="v-mutetext" style={{ marginTop: 16, marginBottom: 0 }}>
-              Status is updated by the attorney as your file moves. You will never
-              learn something about your own application later than we do.
+              {t.apply.trackerFoot}
             </p>
           </div>
         );
@@ -555,28 +535,24 @@ function Portal({ clientId, go }) {
 
       <div className="v-lifegrid">
         <div className="v-lifecard">
-          <div className="v-lifehead">For as long as you carry</div>
+          <div className="v-lifehead">{t.apply.lifeHead1}</div>
           <p className="v-lifetext">
-            The license runs on a three-year cycle, and a lapse is a self-inflicted
-            wound. We calendar your renewal and handle amendments when you add a
-            firearm. Once the license issues, you stay our client.
+            {t.apply.lifeText1}
           </p>
         </div>
         <div className="v-lifecard">
-          <div className="v-lifehead">Someone you trust wants this too</div>
+          <div className="v-lifehead">{t.apply.lifeHead2}</div>
           <p className="v-lifetext">
-            Most of our clients arrive through another client. If someone in your
-            life should be protected the same way, have them mention your name. They
-            get the consultation on us; your file gets priority scheduling.
+            {t.apply.lifeText2}
           </p>
-          <a className="v-quiet v-sm" href={PHONE_TEL}>Introduce someone</a>
+          <a className="v-quiet v-sm" href={PHONE_TEL}>{t.apply.lifeCta2}</a>
         </div>
       </div>
 
       <div className="v-concierge">
         <div className="v-conciergetext">
-          <div className="v-conciergehead">Direct line to counsel</div>
-          Questions go to the attorney, not a call center.
+          <div className="v-conciergehead">{t.apply.conciergeHead}</div>
+          {t.apply.conciergeText}
         </div>
         <a className="v-quiet v-sm" href={PHONE_TEL}>{PHONE}</a>
       </div>
@@ -585,9 +561,11 @@ function Portal({ clientId, go }) {
 }
 
 /* ---------------- flow ---------------- */
-const QUICK = TIERS.find((t) => t.quick);
 
-export default function Flow() {
+
+export default function Flow({ t, lang = "en" }) {
+  const TIERS = t.tiers;
+  const QUICK = TIERS.find((x) => x.quick);
   const params = useSearchParams();
   const requested = params.get("view") || "qualify";
   const [view, setView] = useState(requested === "quick" ? "checkout" : requested);
@@ -624,15 +602,15 @@ export default function Flow() {
   const choose = (p) => { setPack(p); setView("checkout"); window.scrollTo(0, 0); };
   const pickLicense = (p) => { setLic(p); setView("fee"); window.scrollTo(0, 0); };
 
-  const packagesView = <Packages go={go} choose={choose} pickLicense={pickLicense} />;
+  const packagesView = <Packages go={go} choose={choose} pickLicense={pickLicense} t={t} />;
 
   return (
     <>
-      {view === "qualify" && <Qualify go={go} />}
+      {view === "qualify" && <Qualify go={go} t={t} />}
       {view === "packages" && packagesView}
-      {view === "fee" && (lic ? <Fee lic={lic} go={go} choose={choose} /> : packagesView)}
-      {view === "checkout" && (pack ? <Checkout pack={pack} go={go} onOpened={openPortal} /> : packagesView)}
-      {view === "portal" && (clientId ? <Portal clientId={clientId} go={go} /> : packagesView)}
+      {view === "fee" && (lic ? <Fee lic={lic} go={go} choose={choose} t={t} /> : packagesView)}
+      {view === "checkout" && (pack ? <Checkout pack={pack} go={go} onOpened={openPortal} t={t} /> : packagesView)}
+      {view === "portal" && (clientId ? <Portal clientId={clientId} go={go} t={t} /> : packagesView)}
     </>
   );
 }

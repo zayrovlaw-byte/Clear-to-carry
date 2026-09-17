@@ -1,21 +1,9 @@
-import { Suspense } from "react";
-import { Nav, Footer } from "@/lib/ui";
-import Flow from "./flow";
+import Page from "@/lib/pages/Apply";
+import { getDict } from "@/lib/i18n";
+import { altMeta } from "@/lib/meta";
 
-export const metadata = {
-  title: "Apply | NYC Firearm License | Clear to Carry",
-  description:
-    "60-second eligibility screening for a New York City carry, premise, or business firearm license. Flat-fee engagements handled entirely by the attorney.",
-};
+export const metadata = { ...getDict("en").meta.apply, ...altMeta("en", "/apply") };
 
-export default function ApplyPage() {
-  return (
-    <div>
-      <Nav />
-      <Suspense fallback={<div className="v-page v-narrow"><p className="v-mutetext">Loading…</p></div>}>
-        <Flow />
-      </Suspense>
-      <Footer />
-    </div>
-  );
+export default function Route() {
+  return <Page lang="en" />;
 }

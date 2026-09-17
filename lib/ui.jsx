@@ -1,11 +1,14 @@
 import Link from "next/link";
 import { PHONE, PHONE_TEL, BOOKING_URL } from "@/lib/content";
+import { getDict, lp } from "@/lib/i18n";
 import Ribbon from "@/lib/ribbon";
+import LangSwitch from "@/lib/langswitch";
 
 /* ---- Brand: CLEAR TO CARRY over a ghosted 2, underlined.
    This lockup is the only mark. There is no separate crest. ---- */
-export function Wordmark({ size = 1, tagline = true, ghost = true }) {
+export function Wordmark({ size = 1, tagline = true, ghost = true, lang = "en" }) {
   const s = size;
+  const t = getDict(lang);
   return (
     <div className="b-lock" style={{ padding: ghost ? `${30 * s}px ${16 * s}px` : 0 }}>
       {ghost && (
@@ -18,7 +21,7 @@ export function Wordmark({ size = 1, tagline = true, ghost = true }) {
         <div className="b-rule" style={{ margin: `${8 * s}px auto ${tagline ? 7 * s : 0}px` }} />
         {tagline && (
           <div className="b-tag" style={{ fontSize: Math.max(9.5 * s, 8.5) }}>
-            PISTOL LICENSING SERVICE
+            {t.brand.tagline}
           </div>
         )}
       </div>
@@ -239,49 +242,49 @@ export function BookLink({ children, className = "v-gold", onFallback, onNavigat
   );
 }
 
-export function Nav() {
+export function Nav({ lang = "en" }) {
+  const t = getDict(lang);
+  const links = [
+    ["/your-rights", t.nav.rights],
+    ["/reviews", t.nav.reviews],
+    ["/attorney", t.nav.attorney],
+    ["/faq", t.nav.faq],
+    ["/apply", t.nav.apply],
+  ];
   return (
     <header className="v-nav">
       <div className="v-navin">
-        <Link href="/" style={{ textDecoration: "none" }}>
+        <Link href={lp(lang, "/")} style={{ textDecoration: "none" }}>
           <div className="b-navlock">
             <div className="b-words b-navwords">CLEAR <span className="b-to">TO</span> CARRY</div>
             <div className="b-rule b-navrule" />
           </div>
         </Link>
-        <div className="v-navright" style={{ display: "flex", gap: 18, flexWrap: "wrap", justifyContent: "flex-end" }}>
-          <Link className="v-navlink" href="/your-rights">Your Rights</Link>
-          <Link className="v-navlink" href="/reviews">Reviews</Link>
-          <Link className="v-navlink" href="/attorney">Attorney</Link>
-          <Link className="v-navlink" href="/faq">FAQ</Link>
-          <Link className="v-navlink" href="/apply">Apply</Link>
+        <div className="v-navright" style={{ display: "flex", gap: 18, flexWrap: "wrap", justifyContent: "flex-end", alignItems: "center" }}>
+          {links.map(([href, label]) => (
+            <Link className="v-navlink" href={lp(lang, href)} key={href}>{label}</Link>
+          ))}
           <a className="v-navlink v-navphone" href={PHONE_TEL}>{PHONE}</a>
+          <LangSwitch lang={lang} label={t.langLabel} />
         </div>
       </div>
-      <Ribbon />
+      <Ribbon lang={lang} />
     </header>
   );
 }
 
-export function Footer() {
+export function Footer({ lang = "en" }) {
+  const t = getDict(lang);
   return (
     <footer className="v-foot">
-      <Wordmark size={0.72} ghost={false} />
+      <Wordmark size={0.72} ghost={false} lang={lang} />
       <p className="v-foottext" style={{ marginTop: 14 }}>
-        A pistol licensing service of Zayrov Law, P.C. · 3400 Lawson Blvd., Oceanside, NY 11572 · {PHONE}
+        {t.footer.service} · {PHONE}
       </p>
       <p className="v-foottext" style={{ marginTop: 0 }}>
-        <Link className="v-navlink" href="/privacy">Privacy</Link>
+        <Link className="v-navlink" href={lp(lang, "/privacy")}>{t.footer.privacy}</Link>
       </p>
-      <p className="v-legal">
-        Attorney Advertising. Prior results do not guarantee a similar outcome.
-        Testimonials reflect the experience of actual clients and results specific to
-        their matters; your result depends on your record. No attorney-client
-        relationship is formed until a signed engagement letter and payment are
-        received. Licensing decisions are made solely by the issuing authority; no
-        outcome is promised. Timeline references reflect statutory requirements and
-        typical processing, not a guarantee.
-      </p>
+      <p className="v-legal">{t.footer.legal}</p>
     </footer>
   );
 }

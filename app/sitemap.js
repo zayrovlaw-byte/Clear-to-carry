@@ -1,10 +1,23 @@
-const BASE = "https://cleartocarry.nyc";
+import { LOCALES, DEFAULT_LOCALE, lp } from "@/lib/i18n";
+import { SITE } from "@/lib/meta";
+
+const PATHS = ["/", "/apply", "/your-rights", "/reviews", "/attorney", "/faq", "/privacy"];
 
 export default function sitemap() {
-  return ["", "/apply", "/your-rights", "/reviews", "/attorney", "/faq", "/privacy"].map((p) => ({
-    url: BASE + p,
-    lastModified: new Date(),
-    changeFrequency: p === "" ? "weekly" : "monthly",
-    priority: p === "" ? 1 : p === "/apply" ? 0.9 : 0.6,
-  }));
+  const now = new Date();
+  const out = [];
+  for (const path of PATHS) {
+    const languages = {};
+    for (const code of LOCALES) languages[code] = SITE + lp(code, path);
+    for (const code of LOCALES) {
+      out.push({
+        url: SITE + lp(code, path),
+        lastModified: now,
+        changeFrequency: path === "/" ? "weekly" : "monthly",
+        priority: path === "/" ? 1 : path === "/apply" ? 0.9 : 0.6,
+        alternates: { languages: { ...languages, "x-default": SITE + lp(DEFAULT_LOCALE, path) } },
+      });
+    }
+  }
+  return out;
 }

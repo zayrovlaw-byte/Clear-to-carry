@@ -60,7 +60,7 @@ export default function RootLayout({ children }) {
                 addressCountry: "US",
               },
               areaServed: { "@type": "City", name: "New York" },
-              knowsLanguage: ["en", "ru", "he"],
+              knowsLanguage: ["en", "es", "ru", "he"],
             }),
           }}
         />
