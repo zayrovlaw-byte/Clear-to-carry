@@ -246,6 +246,7 @@ export function Nav({ lang = "en" }) {
   const t = getDict(lang);
   const links = [
     ["/your-rights", t.nav.rights],
+    ["/blog", t.nav.blog],
     ["/reviews", t.nav.reviews],
     ["/attorney", t.nav.attorney],
     ["/faq", t.nav.faq],

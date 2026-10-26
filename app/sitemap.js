@@ -1,7 +1,11 @@
 import { LOCALES, DEFAULT_LOCALE, lp } from "@/lib/i18n";
 import { SITE } from "@/lib/meta";
+import { BLOG_META } from "@/lib/schema";
 
-const PATHS = ["/", "/apply", "/your-rights", "/reviews", "/attorney", "/faq", "/privacy"];
+const PATHS = [
+  "/", "/apply", "/your-rights", "/blog", "/reviews", "/attorney", "/faq", "/privacy",
+  ...BLOG_META.map((p) => "/blog/" + p.slug),
+];
 
 export default function sitemap() {
   const now = new Date();

@@ -3,10 +3,9 @@ import { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Eyebrow, LicenseIcon, BookLink } from "@/lib/ui";
-import { BOOKING_URL, ZELLE_TO, PHONE, PHONE_TEL } from "@/lib/content";
+import { BOOKING_URL, PHONE, PHONE_TEL } from "@/lib/content";
 
 const GREEN = "#5FA97F", RED = "#D25A40", CHAMPAGNE = "#E3A64F";
-const fmt = (n) => "$" + n.toLocaleString();
 
 function Field({ label, area, ...props }) {
   return (
@@ -33,9 +32,6 @@ function Qualify({ go, t }) {
   const QUALIFY = t.qualify;
   const [i, setI] = useState(0);
   const [picked, setPicked] = useState([]);
-  const [contact, setContact] = useState({ name: "", phone: "" });
-  const [sent, setSent] = useState(false);
-  const [err, setErr] = useState("");
   const headingRef = useRef(null);
 
   useEffect(() => { if (headingRef.current) headingRef.current.focus(); }, [i]);
@@ -71,29 +67,16 @@ function Qualify({ go, t }) {
   const light = reds.length ? "red" : yellows.length ? "yellow" : "green";
   const notes = [...reds, ...yellows].filter((p) => p.note);
 
-  /* Records the screening answers so the attorney has them before the call,
-     then hands the visitor to payment. keepalive lets the POST finish even
-     though the booking link navigates away immediately. */
-  function recordScreening() {
-    try {
-      fetch("/api/lead", {
-        method: "POST",
-        keepalive: true,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...contact,
-          kind: "screening",
-          light,
-          answers: picked.map((p) => ({ id: p.id, answer: p.label })),
-        }),
-      }).catch(() => {});
-      setSent(true);
-    } catch {}
-  }
+  /* The answers ride along to the consultation request, which is where a name
+     and a phone number finally exist, so the attorney opens the call already
+     knowing the file. Nothing is posted from this screen: there would be
+     nobody to call back. sessionStorage covers the visitor who leaves for an
+     external scheduler and comes back to the form instead. */
+  const screening = { light, answers: picked.map((p) => ({ id: p.id, answer: p.label })) };
 
-  function startPaid() {
-    recordScreening();
-    go("quickcheckout");
+  function toConsult() {
+    try { sessionStorage.setItem("ctc:screening", JSON.stringify(screening)); } catch {}
+    go("consult", screening);
   }
 
   const L = {
@@ -121,19 +104,14 @@ function Qualify({ go, t }) {
             : t.apply.bookHead}
         </div>
         <BookLink className="v-gold v-w100" style={{ textAlign: "center" }}
-          onFallback={startPaid} onNavigate={recordScreening}>
+          onFallback={toConsult}
+          onNavigate={() => { try { sessionStorage.setItem("ctc:screening", JSON.stringify(screening)); } catch {} }}>
           {t.common.getStarted99}
         </BookLink>
         <div className="v-bookfine">
           {t.apply.bookFine}
           {BOOKING_URL ? t.apply.bookFineScheduler : ""}
         </div>
-        {sent && (
-          <p className="v-mutetext" style={{ color: GREEN, marginTop: 14, marginBottom: 0 }}>
-            {t.apply.bookSent}
-          </p>
-        )}
-        {err && <p className="v-mutetext" style={{ color: RED, marginBottom: 0 }}>{err}</p>}
       </div>
 
       <div className="v-bookalt">
@@ -148,9 +126,9 @@ function Qualify({ go, t }) {
 }
 
 /* ---------------- packages ----------------
-   Deliberately price-free. The fee is disclosed on the Fee step, one click
-   from checkout, so the visitor chooses the engagement on its merits first. */
-function Packages({ go, choose, pickLicense, t }) {
+   Levels of support, not a price list. Every button here lands on the same
+   free consultation; what an engagement costs is quoted in that conversation. */
+function Packages({ go, pickLicense, t }) {
   const TIERS = t.tiers, PACKAGES = t.packages;
   const [showLicenses, setShowLicenses] = useState(false);
   return (
@@ -166,18 +144,16 @@ function Packages({ go, choose, pickLicense, t }) {
             {tier.featured && <div className="v-featribbon">{t.apply.mostEngaged}</div>}
             <div className="v-packtier">{tier.tier}</div>
             <div className="v-packname">{tier.name}</div>
-            {tier.quick && (
-              <div>
-                <div className="v-packprice">{fmt(tier.price)}</div>
-                <div className="v-packfine">{tier.fine}</div>
-              </div>
-            )}
             <p className="v-packline">{tier.line}</p>
             <p className="v-packfor">{tier.for}</p>
-            {tier.checkout && (
-              <button className={tier.quick ? "v-gold v-w100" : "v-quiet v-w100"}
-                onClick={() => choose({ id: tier.id, name: tier.name, price: tier.price })}>
-                {tier.quick ? t.apply.getStartedNow : t.apply.continue}
+            {tier.lead && (
+              <button className="v-gold v-w100" onClick={() => go("consult")}>
+                {t.common.getStarted99}
+              </button>
+            )}
+            {!tier.lead && !tier.expands && (
+              <button className="v-quiet v-w100" onClick={() => go("consult")}>
+                {t.apply.startConsult}
               </button>
             )}
             {tier.expands && (
@@ -186,7 +162,7 @@ function Packages({ go, choose, pickLicense, t }) {
               </button>
             )}
             {tier.concierge && (
-              <button className="v-quiet v-w100" onClick={() => go("quickcheckout")}>{t.apply.startConsult}</button>
+              <button className="v-quiet v-w100" onClick={() => go("consult")}>{t.apply.startConsult}</button>
             )}
           </div>
         ))}
@@ -218,29 +194,119 @@ function Packages({ go, choose, pickLicense, t }) {
 
       <div className="v-underpacks">
         <p className="v-mutetext">{t.apply.underPacks}</p>
-        <BookLink className="v-quiet" onFallback={() => go("quickcheckout")}>{t.common.getStarted99}</BookLink>
+        <BookLink className="v-quiet" onFallback={() => go("consult")}>{t.common.getStarted99}</BookLink>
       </div>
     </div>
   );
 }
 
-/* ---------------- fee ----------------
-   Where price finally appears: one click from checkout, after the visitor has
-   picked a licence. Shows the band, what moves it, and the third-party costs. */
-function Fee({ lic, go, choose, t }) {
-  const THIRD_PARTY_COSTS = t.thirdParty, FEE_RANGE = t.feeRange;
+/* ---------------- consultation ----------------
+   The only thing a visitor books from this site, and it is free. Screening
+   answers and the licence they were reading about ride along so the attorney
+   opens the call already knowing the file. */
+function Consult({ lic, screening, go, t }) {
+  const THIRD_PARTY_COSTS = t.thirdParty;
+  const [carried, setCarried] = useState(screening || null);
+  useEffect(() => {
+    if (carried) return;
+    try {
+      const saved = sessionStorage.getItem("ctc:screening");
+      if (saved) setCarried(JSON.parse(saved));
+    } catch {}
+  }, [carried]);
+  const [f, setF] = useState({ name: "", phone: "", email: "", note: "" });
+  const [interest, setInterest] = useState("");
+  const [sent, setSent] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState("");
+  const ready = f.name.trim() && f.phone.trim();
+
+  async function submit() {
+    if (!ready || busy) return;
+    setErr("");
+    setBusy(true);
+    try {
+      await postJson("/api/lead", {
+        ...f,
+        kind: "consult",
+        interest: interest || (lic ? lic.name : ""),
+        light: carried ? carried.light : undefined,
+        answers: carried ? carried.answers : undefined,
+      });
+      setSent(true);
+      window.scrollTo(0, 0);
+    } catch (e) {
+      setErr(e.message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  if (sent) {
+    return (
+      <div className="v-page v-narrow">
+        <div className="v-lightbadge" style={{ color: GREEN, borderColor: GREEN }}>{t.apply.consultSentEyebrow}</div>
+        <h1 className="v-h1 v-h1sm">{t.apply.consultSentH1}</h1>
+        <p className="v-lede v-ledesm">{t.apply.consultSentBody}</p>
+        <a className="v-gold v-w100" style={{ textAlign: "center" }} href={PHONE_TEL}>
+          {t.apply.consultCallNow} · {PHONE}
+        </a>
+        {BOOKING_URL && (
+          <BookLink className="v-quiet v-w100 v-mt" style={{ textAlign: "center" }}>
+            {t.apply.bookFineScheduler.replace(/^\s*·\s*/, "")}
+          </BookLink>
+        )}
+        <p className="v-legal v-mt">{t.apply.consultLegal}</p>
+      </div>
+    );
+  }
+
   return (
     <div className="v-page v-mid">
       <button className="v-back" onClick={() => go("packages")}>{t.apply.backEngagements}</button>
-      <Eyebrow>{t.apply.feeEyebrow} · {lic.name}</Eyebrow>
-      <h1 className="v-h1 v-h1sm">{t.apply.feeH1}</h1>
+      <Eyebrow>{t.apply.consultEyebrow}{lic ? " · " + lic.name : ""}</Eyebrow>
+      <h1 className="v-h1 v-h1sm">{t.apply.consultH1}</h1>
+      <p className="v-lede v-ledesm">{t.apply.consultLede}</p>
 
-      <div className="v-feebox">
-        <div className="v-feelabel">{t.apply.feeLabel}</div>
-        <div className="v-feefigure">{FEE_RANGE}</div>
-        <p className="v-feenote">
-          {t.apply.feeNote}
-        </p>
+      {BOOKING_URL && (
+        <div className="v-bookbox">
+          <div className="v-bookhead">{t.apply.bookHead}</div>
+          <BookLink className="v-gold v-w100" style={{ textAlign: "center" }}>
+            {t.common.getStarted99}
+          </BookLink>
+          <div className="v-bookfine">{t.apply.bookFine}{t.apply.bookFineScheduler}</div>
+        </div>
+      )}
+
+      <div className="v-form">
+        <Field label={t.apply.nameLabel} value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} />
+        <Field label={t.apply.phone} inputMode="tel" value={f.phone} onChange={(e) => setF({ ...f, phone: e.target.value })} />
+        <Field label={t.apply.emailLabel} inputMode="email" value={f.email} onChange={(e) => setF({ ...f, email: e.target.value })} />
+
+        <div className="v-field">
+          <span className="v-fieldlabel">{t.apply.consultInterest}</span>
+          <div className="v-chips">
+            {t.apply.consultOpts.map((o) => (
+              <button key={o} type="button"
+                className={"v-chip" + (interest === o ? " v-chipon" : "")}
+                aria-pressed={interest === o}
+                onClick={() => setInterest(interest === o ? "" : o)}>
+                {o}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <Field area rows={3} label={t.apply.consultNote} value={f.note}
+          onChange={(e) => setF({ ...f, note: e.target.value })} />
+
+        {err && <p className="v-mutetext" style={{ color: RED }}>{err}</p>}
+        <button className="v-gold v-w100" onClick={submit} disabled={!ready || busy}>
+          {busy ? t.apply.portalSending : t.apply.consultSubmit}
+        </button>
+        <div className="v-bookalt">
+          {t.apply.bookAltPre}<a className="v-goldlink" href={PHONE_TEL}>{PHONE}</a>.
+        </div>
       </div>
 
       <div className="v-costs" style={{ marginTop: 34 }}>
@@ -265,93 +331,7 @@ function Fee({ lic, go, choose, t }) {
         </div>
       </div>
 
-      <BookLink className="v-gold v-w100 v-mt" style={{ textAlign: "center" }}
-        onFallback={() => choose({ id: QUICK.id, name: QUICK.name, price: QUICK.price })}>
-        {t.apply.feeNotReady} {fmt(QUICK.price)}
-      </BookLink>
-      <BookLink className="v-quiet v-w100 v-mt" style={{ textAlign: "center" }}
-        onFallback={() => go("quickcheckout")}>
-        {t.apply.feeExact}
-      </BookLink>
-      <p className="v-mutetext v-mt">
-        {t.apply.feeFoot}
-      </p>
-    </div>
-  );
-}
-
-/* ---------------- checkout ---------------- */
-function Checkout({ pack, go, onOpened, t }) {
-  const [f, setF] = useState({ name: "", phone: "", email: "" });
-  const [ack, setAck] = useState(false);
-  const [step, setStep] = useState("info");
-  const [created, setCreated] = useState(null);
-  const [err, setErr] = useState("");
-  const infoReady = f.name.trim() && f.phone.trim() && ack;
-
-  async function toZelle() {
-    if (!infoReady) return;
-    setErr("");
-    try {
-      const res = await postJson("/api/client", {
-        ...f,
-        packageId: pack.id,
-        packageName: pack.name,
-        price: pack.price,
-      });
-      setCreated(res);
-      setStep("zelle");
-    } catch (e) {
-      setErr(e.message);
-    }
-  }
-
-  return (
-    <div className="v-page v-narrow">
-      <button className="v-back" onClick={() => go("packages")}>{t.apply.backEngagements}</button>
-      <Eyebrow>{t.apply.checkoutEyebrow}</Eyebrow>
-      <h1 className="v-h1 v-h1sm">{pack.name}</h1>
-      <div className="v-checkprice">{fmt(pack.price)} <span className="v-checkflat">{pack.id === "tier-quick" ? t.apply.initialConsultation : t.apply.flatFee}</span></div>
-
-      {step === "info" && (
-        <div className="v-form">
-          <Field label={t.apply.fullName} value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} />
-          <Field label={t.apply.phone} inputMode="tel" value={f.phone} onChange={(e) => setF({ ...f, phone: e.target.value })} />
-          <Field label={t.apply.email} inputMode="email" value={f.email} onChange={(e) => setF({ ...f, email: e.target.value })} />
-          <label className="v-ack">
-            <input type="checkbox" checked={ack} onChange={(e) => setAck(e.target.checked)} />
-            <span>
-              {pack.id === "tier-quick"
-                ? t.apply.ackQuick
-                : t.apply.ackFull}
-            </span>
-          </label>
-          {err && <p className="v-mutetext" style={{ color: RED }}>{err}</p>}
-          <button className="v-gold v-w100" onClick={toZelle} disabled={!infoReady}>{t.apply.toPayment}</button>
-          <p className="v-mutetext v-mt">
-            {pack.id === "tier-quick"
-              ? t.apply.afterQuick
-              : t.apply.afterFull}
-          </p>
-        </div>
-      )}
-
-      {step === "zelle" && created && (
-        <div className="v-zelle">
-          <div className="v-zellecard">
-            <div className="v-zellehead">{t.apply.zelleHead}</div>
-            <div className="v-zellerow"><span className="v-zellelabel">{t.apply.zelleTo}</span><span className="v-zelleval">{ZELLE_TO}</span></div>
-            <div className="v-zellerow"><span className="v-zellelabel">{t.apply.zelleAmount}</span><span className="v-zelleval">{fmt(pack.price)}</span></div>
-            <div className="v-zellerow"><span className="v-zellelabel">{t.apply.zelleMemo}</span><span className="v-zelleval">{created.ref}</span></div>
-            <p className="v-zellenote">
-              {t.apply.zelleNote} {PHONE}.
-            </p>
-          </div>
-          <button className="v-gold v-w100" onClick={() => onOpened(created.id)}>{t.apply.zelleOpen}</button>
-          <button className="v-quiet v-w100 v-mt" onClick={() => onOpened(created.id)}>{t.apply.zelleLater}</button>
-          <p className="v-mutetext v-mt">{t.apply.zelleProvisional}</p>
-        </div>
-      )}
+      <p className="v-legal v-mt">{t.apply.consultLegal}</p>
     </div>
   );
 }
@@ -564,15 +544,11 @@ function Portal({ clientId, go, t }) {
 
 
 export default function Flow({ t, lang = "en" }) {
-  const TIERS = t.tiers;
-  const QUICK = TIERS.find((x) => x.quick);
   const params = useSearchParams();
   const requested = params.get("view") || "qualify";
-  const [view, setView] = useState(requested === "quick" ? "checkout" : requested);
-  const [pack, setPack] = useState(
-    requested === "quick" ? { id: QUICK.id, name: QUICK.name, price: QUICK.price } : null
-  );
+  const [view, setView] = useState(requested === "quick" ? "consult" : requested);
   const [lic, setLic] = useState(null);
+  const [screening, setScreening] = useState(null);
   const [clientId, setClientId] = useState(null);
 
   useEffect(() => {
@@ -581,35 +557,22 @@ export default function Flow({ t, lang = "en" }) {
     if (params.get("view") === "portal" && saved) setView("portal");
   }, [params]);
 
-  function openPortal(id) {
-    window.localStorage.setItem("ctc:clientId", id);
-    setClientId(id);
-    setView("portal");
-  }
-
-  const go = (v) => {
+  const go = (v, extra) => {
     if (v === "portal" && !clientId) return setView("packages");
-    if (v === "quickcheckout") {
-      setPack({ id: QUICK.id, name: QUICK.name, price: QUICK.price });
-      setView("checkout");
-      window.scrollTo(0, 0);
-      return;
-    }
-    setView(v);
+    if (v === "consult" && extra) setScreening(extra);
+    setView(v === "quickcheckout" ? "consult" : v);
     window.scrollTo(0, 0);
   };
 
-  const choose = (p) => { setPack(p); setView("checkout"); window.scrollTo(0, 0); };
-  const pickLicense = (p) => { setLic(p); setView("fee"); window.scrollTo(0, 0); };
+  const pickLicense = (p) => { setLic(p); setView("consult"); window.scrollTo(0, 0); };
 
-  const packagesView = <Packages go={go} choose={choose} pickLicense={pickLicense} t={t} />;
+  const packagesView = <Packages go={go} pickLicense={pickLicense} t={t} />;
 
   return (
     <>
       {view === "qualify" && <Qualify go={go} t={t} />}
       {view === "packages" && packagesView}
-      {view === "fee" && (lic ? <Fee lic={lic} go={go} choose={choose} t={t} /> : packagesView)}
-      {view === "checkout" && (pack ? <Checkout pack={pack} go={go} onOpened={openPortal} t={t} /> : packagesView)}
+      {view === "consult" && <Consult lic={lic} screening={screening} go={go} t={t} />}
       {view === "portal" && (clientId ? <Portal clientId={clientId} go={go} t={t} /> : packagesView)}
     </>
   );

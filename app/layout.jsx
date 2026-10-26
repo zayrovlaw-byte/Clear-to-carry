@@ -4,7 +4,7 @@ import Reveal from "./reveal";
 /* metadataBase presumes the production domain. If launch lands on a different
    domain, change it here and in app/sitemap.js + app/robots.js. */
 export const metadata = {
-  metadataBase: new URL("https://cleartocarry.nyc"),
+  metadataBase: new URL("https://cleartocarrynyc.com"),
   title: "Clear to Carry | NYC Pistol Licensing Service | Zayrov Law, P.C.",
   description:
     "New York City pistol licensing, handled entirely by counsel. Carry, premise, business, special carry, long gun, and security guard licenses. Flat fee, attorney-handled, start to license. Free eligibility screening in 60 seconds.",
@@ -48,7 +48,7 @@ export default function RootLayout({ children }) {
               alternateName: "Zayrov Law, P.C.",
               description:
                 "New York City pistol licensing service. Carry, premise, business, special carry, long gun, and security guard licences, handled entirely by an attorney.",
-              url: "https://cleartocarry.nyc",
+              url: "https://cleartocarrynyc.com",
               telephone: "+1-347-335-5723",
               priceRange: "$$$",
               address: {

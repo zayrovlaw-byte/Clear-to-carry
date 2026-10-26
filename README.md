@@ -15,7 +15,8 @@ Open http://localhost:3000
 ## What is where
 
 - `/`            Landing page (server-rendered, SEO)
-- `/apply`       60-second screening -> tiers/packages -> Zelle checkout -> client portal
+- `/apply`       60-second screening -> levels of support -> free consultation request
+- `/blog`        Updates: licensing developments, one post per file in `BLOG_META`
 - `/your-rights` Article page (SEO surface; `/bruen` redirects here)
 - `/reviews`     Testimonials and success stories (placeholder content until launch)
 - `/attorney`    Attorney bio page
@@ -24,7 +25,11 @@ Open http://localhost:3000
 - `app/api/lead`    stores leads, emails you instantly
 - `app/api/client`  creates/fetches/updates client files
 - `app/api/upload`  validated document uploads (PDF/images, 15 MB cap) to data/uploads/<clientId>/
-- `lib/content.js`  ALL copy, prices, questionnaire, phases. Edit prices here.
+- `lib/schema.js`   Structure: licence types, support levels, screening questions
+                    and grades, blog slugs and dates. Not translated.
+- `lib/locales/*`   ALL copy, in English, Spanish and Russian. The three files
+                    must keep identical key shapes; see "Languages".
+- `lib/content.js`  Phone number and the booking-link switch only.
 - `data/`           leads.json, clients.json, uploads/ (gitignored)
 
 ## Languages
@@ -64,30 +69,48 @@ separate crest. Three typefaces total and no more: Cormorant Garamond for
 display, Inter for body, IBM Plex Mono for labels and eyebrows. Adding a
 fourth is how a brand stops looking like one.
 
-## Booking and payment
+## Booking
 
-Every "Get started · $99" button on the site routes through one switch:
+The consultation is free. It is the only thing a visitor books from the site,
+and nothing on the site quotes a fee for anything else — representation is
+scoped and quoted in that conversation. Every consultation button routes
+through one switch:
 
     NEXT_PUBLIC_BOOKING_URL
 
-**Set it** to a scheduling link that collects the fee at booking — Calendly with
-Stripe/PayPal on a paid event type, Booksy, Acuity, Square Appointments — and
-every button opens that page, where the client picks a time and pays in one
-step. The screening answers are still POSTed to /api/lead first, so the matter
-is in your inbox before the call.
+**Set it** to a scheduling link — Calendly, Booksy, Acuity, Square Appointments
+— and every button opens that page for the visitor to pick a time. Create the
+event type as a **free** event: do not connect Stripe or PayPal to it. The
+screening answers travel with the visitor (sessionStorage) and reach you with
+the consultation request, so you open the call already knowing the file.
 
-**Leave it empty** and the buttons fall back to the site's own checkout: contact
-details, an acknowledgement, then Zelle instructions with a memo reference you
-match in your bank app. Nothing breaks; it is just manual scheduling.
+**Leave it empty** and the buttons fall back to the site's own consultation
+request form: name, phone, optional email, what they want to protect, and a
+note. It POSTs to /api/lead, which emails you and appends to
+`data/leads.json`. Nothing breaks; it is just that you do the scheduling.
 
-Setting up Calendly + Stripe takes about fifteen minutes: create a $99 event
-type, connect Stripe under Payments, copy the event link, paste it into the env
-var. Change the price in Calendly and in `TIERS` in `lib/content.js` together —
-the site does not read Calendly's price.
+Either way the office phone number stays visible in the nav and under every
+screening result, because some people would rather just call.
 
-There is no free-consultation path anywhere in the funnel by design. The
-screening ends on the paid booking; the office phone number stays visible in the
-nav and under the screening result for people who would rather call.
+## Updates (blog)
+
+The blog is the lead-generation surface: someone searching "NYC gun licence
+arrest record" lands on a post, reads a plain-language answer, and the free
+consultation is one click away.
+
+To add a post:
+
+1. Add an entry to `BLOG_META` in `lib/schema.js` — slug, date (`YYYY-MM-DD`),
+   and a short tag. Newest first; that array is the display order.
+2. Add the matching `blog["<slug>"]` entry to **all three** locale files with
+   `title`, `dek` and a `body` array of paragraphs. A slug present in one
+   language and missing from another fails the build, which is deliberate.
+3. Routes, metadata, hreflang, sitemap entries and BlogPosting structured data
+   are generated from those two things. There is nothing else to wire up.
+
+Keep posts to published law and process. No case outcomes, no predictions, and
+each post carries the general-commentary disclaimer from
+`blogPage.legal` — advertising rules do not stop applying because it is a blog.
 
 ## Hero photograph
 
@@ -112,12 +135,11 @@ letter is an expensive way to save $50.
 
 ## Before launch, in order
 
-1. Confirm the fee band and consultation fee in `lib/content.js` (advertised
-   fees bind for 30 days under RPC 7.1).
-2. Substantiate the figures in `RESULTS` in `lib/content.js` — see the comment
-   block above them. Keep records of applications filed and approved; update
-   `asOf` when you refresh them. If a figure cannot be proven from your own
-   files, lower it or delete it.
+1. Substantiate the figures in `results` in `lib/locales/*` — keep records of
+   applications filed and approved, and update `asOf` when you refresh them. If
+   a figure cannot be proven from your own files, lower it or delete it. (No
+   fee appears anywhere on the site, so nothing here binds you for 30 days
+   under RPC 7.1. If you ever add one, that rule applies.)
 3. Replace placeholder testimonials and approval specimens on `/reviews` with
    real, consented client material.
 4. Add your professional portrait (replace the photo frame block in
@@ -129,7 +151,7 @@ letter is an expensive way to save $50.
 
 ## Domain-bound settings
 
-The production domain is assumed to be cleartocarry.nyc in three places:
+The production domain is assumed to be cleartocarrynyc.com in three places:
 `metadataBase` in `app/layout.jsx`, `app/sitemap.js`, and `app/robots.js`.
 Launching on a different domain means changing all three. The share card is
 `public/og.png` (regenerate if the brand changes); local-business structured
@@ -144,14 +166,15 @@ small VPS, not serverless Vercel:
   at /data -> set env vars DATA_DIR=/data and UPLOAD_DIR=/data/uploads -> done.
 - Any VPS: `npm run build && npm start` behind Caddy or nginx for HTTPS.
 
-Point cleartocarry.nyc (or your chosen domain) at it.
+Point cleartocarrynyc.com (or your chosen domain) at it.
 
 ## Attorney workflow (no admin UI yet, by design)
 
 - Leads land in `data/leads.json` and your inbox. Call fast.
-- New engagements email you with the Zelle memo ref. Match payment in your bank
-  app, send the engagement letter.
-- To verify payment / advance status / mark filed, edit `data/clients.json`
+- Every lead is a free consultation request. Quote the engagement on the call
+  and send the engagement letter yourself; the site takes no payment and names
+  no figure.
+- To record a retainer / advance status / mark filed, edit `data/clients.json`
   (fields: paymentVerified, phase, filedAt, appStatus 0-3) or ask Claude Code to
   build the admin screen next.
 

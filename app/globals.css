@@ -947,3 +947,42 @@ input, select, textarea { accent-color: #E3A64F; }
 .v-langon { color: #150E08; background: #E3A64F; border-color: #E3A64F; }
 .v-langon:hover { color: #150E08; }
 @media (max-width: 720px) { .v-lang { padding: 3px 5px; font-size: 9.5px; } }
+
+/* updates (blog) */
+.v-posts { display: grid; grid-template-columns: 1fr; gap: 18px; margin: 40px 0 10px; }
+.v-post {
+  display: block; text-decoration: none; border: 1px solid #3B2A1D; background: #211611;
+  padding: 28px 26px; border-left: 2px solid #A5732F;
+  transition: border-color .15s, transform .15s, box-shadow .15s;
+}
+.v-post:hover {
+  border-color: #A5732F; border-left-color: #E3A64F;
+  transform: translateY(-2px); box-shadow: 0 14px 30px rgba(0,0,0,0.3);
+}
+.v-postmeta {
+  font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.18em;
+  text-transform: uppercase; color: #8C7560; margin-bottom: 12px;
+}
+.v-posttitle {
+  font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 500;
+  font-size: 25px; line-height: 1.22; color: #F3E7D8; margin: 0 0 10px;
+}
+.v-postdek { color: #BFA78C; font-size: 15px; line-height: 1.6; margin: 0 0 16px; max-width: 64ch; }
+.v-postmore {
+  font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.2em;
+  text-transform: uppercase; color: #E3A64F;
+}
+@media (min-width: 760px) {
+  .v-posttitle { font-size: 29px; }
+}
+
+/* consultation interest chips */
+.v-chips { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 4px; }
+.v-chip {
+  background: #211611; border: 1px solid #3B2A1D; color: #BFA78C;
+  font-family: inherit; font-size: 14px; padding: 11px 16px; cursor: pointer;
+  transition: border-color .15s, color .15s, background .15s;
+}
+.v-chip:hover { border-color: #A5732F; color: #F3E7D8; }
+.v-chipon { border-color: #E3A64F; color: #150E08; background: #E3A64F; }
+.v-chipon:hover { color: #150E08; background: #E3A64F; }
