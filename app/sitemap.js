@@ -3,7 +3,7 @@ import { SITE } from "@/lib/meta";
 import { BLOG_META } from "@/lib/schema";
 
 const PATHS = [
-  "/", "/apply", "/your-rights", "/blog", "/reviews", "/attorney", "/faq", "/privacy",
+  "/", "/apply", "/why-us", "/your-rights", "/blog", "/reviews", "/attorney", "/faq", "/privacy",
   ...BLOG_META.map((p) => "/blog/" + p.slug),
 ];
 

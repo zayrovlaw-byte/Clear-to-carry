@@ -64,6 +64,7 @@ export default function Attorney({ lang = "en" }) {
       </section>
 
       <Skyline />
+      <p className="v-legal v-mt" style={{ maxWidth: "70ch", margin: "0 auto", padding: "0 22px 44px" }}>{t.attorney.legal}</p>
       <Footer lang={lang} />
     </div>
   );

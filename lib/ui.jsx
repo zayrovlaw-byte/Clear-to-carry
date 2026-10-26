@@ -245,6 +245,7 @@ export function BookLink({ children, className = "v-gold", onFallback, onNavigat
 export function Nav({ lang = "en" }) {
   const t = getDict(lang);
   const links = [
+    ["/why-us", t.nav.why],
     ["/your-rights", t.nav.rights],
     ["/blog", t.nav.blog],
     ["/reviews", t.nav.reviews],
@@ -285,6 +286,7 @@ export function Footer({ lang = "en" }) {
       <p className="v-foottext" style={{ marginTop: 0 }}>
         <Link className="v-navlink" href={lp(lang, "/privacy")}>{t.footer.privacy}</Link>
       </p>
+      <div className="v-advlabel">{t.common.attorneyAdvertising}</div>
       <p className="v-legal">{t.footer.legal}</p>
     </footer>
   );

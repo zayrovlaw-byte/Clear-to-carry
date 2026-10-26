@@ -30,7 +30,7 @@ export default function Home({ lang = "en" }) {
           <p className="v-lede v-ledehero">{h.heroLede}</p>
           <div className="v-herobtns">
             <Link className="v-gold" href={lp(lang, "/apply")}>{t.common.qualify60}</Link>
-            <Link className="v-quiet" href={lp(lang, "/apply?view=quick")}>{t.common.getStarted99}</Link>
+            <Link className="v-quiet" href={lp(lang, "/apply?view=consult")}>{t.common.getStarted99}</Link>
           </div>
           <div className="v-heronote">{h.heroNote}</div>
         </div>
@@ -111,7 +111,7 @@ export default function Home({ lang = "en" }) {
             <p className="v-whoclose">{h.whoClose}</p>
             <div className="v-herobtns">
               <Link className="v-gold" href={lp(lang, "/apply")}>{t.common.freeScreening}</Link>
-              <Link className="v-quiet" href={lp(lang, "/apply?view=quick")}>{t.common.getStarted99}</Link>
+              <Link className="v-quiet" href={lp(lang, "/apply?view=consult")}>{t.common.getStarted99}</Link>
             </div>
           </div>
         </div>
@@ -153,6 +153,10 @@ export default function Home({ lang = "en" }) {
           </span>
         ))}
       </div>
+
+      <p className="v-legal v-mt" style={{ maxWidth: "70ch", margin: "0 auto", padding: "0 22px" }}>
+        {h.legal}
+      </p>
 
       <section className="v-finalcta" data-reveal>
         <h2 className="v-h2" style={{ marginBottom: 24 }}>

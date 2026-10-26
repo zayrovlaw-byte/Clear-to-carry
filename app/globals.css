@@ -986,3 +986,9 @@ input, select, textarea { accent-color: #E3A64F; }
 .v-chip:hover { border-color: #A5732F; color: #F3E7D8; }
 .v-chipon { border-color: #E3A64F; color: #150E08; background: #E3A64F; }
 .v-chipon:hover { color: #150E08; background: #E3A64F; }
+
+/* Standing advertising label above the footer fine print. */
+.v-advlabel {
+  font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; letter-spacing: 0.3em;
+  text-transform: uppercase; color: #A5732F; margin-bottom: 12px;
+}

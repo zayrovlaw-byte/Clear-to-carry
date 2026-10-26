@@ -17,6 +17,7 @@ Open http://localhost:3000
 - `/`            Landing page (server-rendered, SEO)
 - `/apply`       60-second screening -> levels of support -> free consultation request
 - `/blog`        Updates: licensing developments, one post per file in `BLOG_META`
+- `/why-us`      Why hire counsel: the do-it-yourself comparison and the benefits list
 - `/your-rights` Article page (SEO surface; `/bruen` redirects here)
 - `/reviews`     Testimonials and success stories (placeholder content until launch)
 - `/attorney`    Attorney bio page
@@ -144,10 +145,38 @@ letter is an expensive way to save $50.
    real, consented client material.
 4. Add your professional portrait (replace the photo frame block in
    `app/attorney/page.jsx`).
-5. Add the hero photograph (see above).
+5. Add the hero photograph (see above). The person in `public/hero-nyc.jpg`
+   is the attorney himself, confirmed. Keep it that way: under RPC 7.1 a
+   non-lawyer portraying the lawyer has to be disclosed as such, so swapping
+   in a model or a stock photo later means adding that disclosure.
 6. Sign up at resend.com (free), verify your domain, put the API key and
    NOTIFY_EMAIL in `.env`. Until then, notifications only print to the server log.
 7. Review `/privacy` wording.
+
+## Disclaimers (RPC 7.1)
+
+These are content, not decoration; if you edit the copy, keep them.
+
+- **"Attorney Advertising"** renders above the footer fine print on every page
+  (`common.attorneyAdvertising` via `Footer` in `lib/ui.jsx`). The rule requires
+  it on the home page; site-wide is simply easier to keep true.
+- **Footer fine print** (`footer.legal`) carries prior results, testimonials,
+  no attorney-client relationship, who decides licences, and timelines. It is
+  on every page because `Footer` is.
+- **Page-level fine print**, for the pages that make their own claims:
+  `home.legal` (timelines and the do-it-yourself comparison),
+  `attorney.legal`, `whyPage.legal`, `rightsPage.legal`, `faqPage.legal`,
+  `blogPage.legal` (general commentary, not advice),
+  `apply.screeningLegal` and `apply.consultLegal` (the screening is not
+  advice; the form creates no relationship), and `resultsDisclaimer` under
+  the figures on `/reviews`.
+- **No fee is advertised anywhere**, so nothing on the site binds you for 30
+  days. Add a figure and that rule starts applying to it.
+- **Nothing promises an outcome.** Keep it that way when you edit headlines:
+  "we get you licensed" is the sentence that creates the problem.
+
+The `97%` and `Hundreds` figures on `/reviews` are claims about your own
+files. Keep records that substantiate them and update `results.asOf`.
 
 ## Domain-bound settings
 
