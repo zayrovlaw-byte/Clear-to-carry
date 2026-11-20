@@ -1,12 +1,11 @@
 import Link from "next/link";
 import { PHONE, PHONE_TEL, BOOKING_URL } from "@/lib/content";
 import { getDict, lp } from "@/lib/i18n";
-import Ribbon from "@/lib/ribbon";
 import LangSwitch from "@/lib/langswitch";
 
 /* ---- Brand: CLEAR TO CARRY over a ghosted 2, underlined.
    This lockup is the only mark. There is no separate crest. ---- */
-export function Wordmark({ size = 1, tagline = true, ghost = true, lang = "en" }) {
+export function Wordmark({ size = 1, tagline = true, ghost = false, lang = "en" }) {
   const s = size;
   const t = getDict(lang);
   return (
@@ -248,7 +247,6 @@ export function Nav({ lang = "en" }) {
     ["/why-us", t.nav.why],
     ["/your-rights", t.nav.rights],
     ["/blog", t.nav.blog],
-    ["/reviews", t.nav.reviews],
     ["/attorney", t.nav.attorney],
     ["/faq", t.nav.faq],
     ["/apply", t.nav.apply],
@@ -262,7 +260,7 @@ export function Nav({ lang = "en" }) {
             <div className="b-rule b-navrule" />
           </div>
         </Link>
-        <div className="v-navright" style={{ display: "flex", gap: 18, flexWrap: "wrap", justifyContent: "flex-end", alignItems: "center" }}>
+        <div className="v-navright">
           {links.map(([href, label]) => (
             <Link className="v-navlink" href={lp(lang, href)} key={href}>{label}</Link>
           ))}
@@ -270,7 +268,6 @@ export function Nav({ lang = "en" }) {
           <LangSwitch lang={lang} label={t.langLabel} />
         </div>
       </div>
-      <Ribbon lang={lang} />
     </header>
   );
 }

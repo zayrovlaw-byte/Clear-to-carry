@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Nav, Footer, Eyebrow, Skyline } from "@/lib/ui";
+import { Nav, Footer, Eyebrow } from "@/lib/ui";
 import { getDict, lp } from "@/lib/i18n";
 import HtmlLang from "@/lib/htmllang";
 import { PHONE, PHONE_TEL } from "@/lib/content";
@@ -15,10 +15,7 @@ export default function Attorney({ lang = "en" }) {
       <section className="v-bio">
         <div className="v-bioinner">
           <aside className="v-bioaside">
-            <div className="v-photoframe">
-              <div className="v-photomark" aria-hidden="true">2</div>
-              <div className="v-photonote">{a.portraitNote}</div>
-            </div>
+            <img className="v-portrait" src="/manny-zayrov.jpg" alt="Manny Zayrov, Esq." />
             <div className="v-creds">
               {a.creds.map((c) => <span className="v-cred" key={c}>{c}</span>)}
             </div>
@@ -63,7 +60,6 @@ export default function Attorney({ lang = "en" }) {
         </div>
       </section>
 
-      <Skyline />
       <p className="v-legal v-mt" style={{ maxWidth: "70ch", margin: "0 auto", padding: "0 22px 44px" }}>{t.attorney.legal}</p>
       <Footer lang={lang} />
     </div>

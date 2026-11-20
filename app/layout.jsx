@@ -7,7 +7,7 @@ export const metadata = {
   metadataBase: new URL("https://cleartocarrynyc.com"),
   title: "Clear to Carry | NYC Pistol Licensing Service | Zayrov Law, P.C.",
   description:
-    "New York City pistol licensing, handled entirely by counsel. Carry, premise, business, special carry, long gun, and security guard licenses. Flat fee, attorney-handled, start to license. Free eligibility screening in 60 seconds.",
+    "New York City pistol licensing, handled entirely by counsel. Carry, premise, business, special carry, long gun, and security guard licenses. Attorney-handled, start to license. Free eligibility screening in 60 seconds; $159 consultation credited toward your retainer.",
   keywords:
     "NYC concealed carry lawyer, NYC gun license attorney, NYPD License Division, carry permit attorney New York, non-resident carry NYC, premise license lawyer",
   openGraph: {
@@ -33,7 +33,7 @@ export default function RootLayout({ children }) {
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
-          href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Inter:wght@400;500&display=swap"
           rel="stylesheet"
         />
         {/* Local-business structured data: how Google connects this site to
@@ -50,7 +50,7 @@ export default function RootLayout({ children }) {
                 "New York City pistol licensing service. Carry, premise, business, special carry, long gun, and security guard licences, handled entirely by an attorney.",
               url: "https://cleartocarrynyc.com",
               telephone: "+1-347-335-5723",
-              priceRange: "$$$",
+              priceRange: "$$",
               address: {
                 "@type": "PostalAddress",
                 streetAddress: "3400 Lawson Blvd.",
@@ -64,7 +64,6 @@ export default function RootLayout({ children }) {
             }),
           }}
         />
-        <link rel="preload" as="image" href="/hero-nyc.webp" type="image/webp" />
       </head>
       <body>
         {children}

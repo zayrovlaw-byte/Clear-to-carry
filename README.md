@@ -1,216 +1,92 @@
-# Clear to Carry - production site
+# Clear to Carry NYC (cleartocarrynyc.com)
 
-NYC firearm license practice site for Zayrov Law, P.C. Next.js 14, no database
-server required (JSON file storage suits a solo firm's volume), instant email
-notifications on every lead and upload.
+NYC firearm license practice site for Zayrov Law, P.C. Next.js 16, English,
+Spanish and Russian, JSON-file storage (no database server), email through the
+firm's Gmail / Google Workspace account, and an attorney dashboard at `/admin`.
 
-## Run it locally
+## How a client moves through it
+
+1. **Free screening** (`/apply`): 7 questions, then a green / yellow / red result
+   with plain-language notes. Visitors not ready to book can leave a callback number.
+2. **Book the consultation**: $159, 15 to 30 minutes, credited in full toward any
+   retainer. The client gives name, phone, email and an acknowledgment, then sees
+   Zelle instructions with a reference number. The same details are emailed to them,
+   in their language, with their private link.
+3. **You**: watch for the Zelle payment, tick *$159 consult paid* in `/admin` (the
+   client is emailed), and call to schedule.
+4. **After the consultation**: in `/admin`, enter the engagement and the flat fee you
+   quoted, and press *Send quote and open portal*. The client is emailed the fee, the
+   $159 credit, the balance, Zelle instructions, and their portal link.
+5. **Portal**: four steps (Identity, Residence, History, Qualification). The client
+   uploads only what each step asks for; the next step opens when the current one is
+   complete. Uploads are refused until you open the portal.
+6. **Filing**: tick *Filed*, then move the status. The client's portal shows the
+   stage and the 180-day clock, and each change emails them.
+
+## Attorney dashboard: `/admin`
+
+Sign in with `ADMIN_PASSWORD`. Two tabs:
+
+- **Consultations & clients**: every booking, with screening answers, language, and
+  controls for consult payment, quote, engagement letter, retainer, step, filing,
+  status, outcome, uploaded documents, and private notes.
+- **Callbacks**: people who asked for a call instead of booking, with pipeline stages.
+
+You get an email for every booking, callback and upload.
+
+## Where to edit things
+
+- `lib/content.js`: phone, consultation fee and length, Zelle address, optional scheduler link.
+- `lib/locales/launch.js`: all launch copy (pricing, booking, portal, attorney bio),
+  English, Spanish and Russian side by side. Edit here first.
+- `lib/locales/{en,es,ru}.js`: the rest of the site text. All three must keep identical keys.
+- `lib/schema.js`: structure (license types, screening grades, blog slugs and dates).
+- `lib/emails.js`: client emails in all three languages.
+- `app/globals.css`: the design. Colors are tokens at the top.
+
+## Testimonials and results
+
+The Reviews page is unpublished. Add real, client-approved testimonials only
+(NY Rules of Professional Conduct 7.1), with the client's written consent, before
+bringing it back. Do not publish approval rates or client counts unless the firm's
+records support them.
+
+## Hosting (Railway, about $5/month)
+
+Clients upload documents, so the site needs a server with a disk. Vercel won't work.
+
+1. railway.app, sign in with GitHub, **New Project**, **Deploy from GitHub repo**, pick `Clear-to-carry`.
+2. Service **Settings**, **Volumes**, **Add Volume**, mount path `/data`.
+3. **Variables**: add every line from `.env.example` with real values.
+4. **Settings**, **Networking**, **Custom Domain**: add `cleartocarrynyc.com` and
+   `www.cleartocarrynyc.com`, then add the DNS records Railway shows at your registrar.
+5. Railway deploys on every push to the branch you select (normally `main`).
+
+## Before launch
+
+1. Set `ADMIN_PASSWORD` (10+ characters), `SMTP_USER`, `SMTP_PASS` (a Google app
+   password), `NOTIFY_EMAIL`, `NEXT_PUBLIC_ZELLE_TO`, `SITE_URL`.
+2. Book a test consultation yourself and check both emails arrive.
+3. Have a native speaker read the Spanish and Russian disclaimers and pricing text.
+4. Turn on Railway volume backups: `/data` holds client documents.
+
+## Run locally
 
     npm install
-    cp .env.example .env
+    cp .env.example .env    # DATA_DIR=./data works locally
     npm run dev
 
-Open http://localhost:3000
-
-## What is where
-
-- `/`            Landing page (server-rendered, SEO)
-- `/apply`       60-second screening -> levels of support -> free consultation request
-- `/blog`        Updates: licensing developments, one post per file in `BLOG_META`
-- `/why-us`      Why hire counsel: the do-it-yourself comparison and the benefits list
-- `/your-rights` Article page (SEO surface; `/bruen` redirects here)
-- `/reviews`     Testimonials and success stories (placeholder content until launch)
-- `/attorney`    Attorney bio page
-- `/faq`         FAQ with schema.org markup (Google rich results)
-- `/privacy`     Privacy policy
-- `app/api/lead`    stores leads, emails you instantly
-- `app/api/client`  creates/fetches/updates client files
-- `app/api/upload`  validated document uploads (PDF/images, 15 MB cap) to data/uploads/<clientId>/
-- `lib/schema.js`   Structure: licence types, support levels, screening questions
-                    and grades, blog slugs and dates. Not translated.
-- `lib/locales/*`   ALL copy, in English, Spanish and Russian. The three files
-                    must keep identical key shapes; see "Languages".
-- `lib/content.js`  Phone number and the booking-link switch only.
-- `data/`           leads.json, clients.json, uploads/ (gitignored)
-
-## Languages
-
-English at `/`, Spanish at `/es`, Russian at `/ru` — real pages, not a
-translate widget, so each one is separately indexable and carries hreflang
-tags pointing at its siblings.
-
-- `lib/schema.js` holds the structure: ids, prices, icons, screening grades.
-  It exists once, so a price or a grade can never drift between languages.
-- `lib/locales/{en,es,ru}.js` hold only text, keyed by those same ids.
-- `lib/i18n.js` merges the two and is the single entry point: `getDict(lang)`.
-- `lp(lang, path)` builds locale-correct links; the switcher in the nav keeps
-  the reader on the same page when they change language.
-
-**To change copy, edit all three locale files.** They must keep identical keys.
-To add a language: add a file under `lib/locales`, register it in `LOCALES` and
-`LOCALE_LABELS` in `lib/i18n.js`, and the routes, sitemap and hreflang follow
-automatically.
-
-**The translations need a native-speaker review before launch**, especially the
-disclaimers in `footer.legal`, `resultsDisclaimer` and the checkout
-acknowledgements. They are accurate, but a lawyer's advertising copy in another
-language should be read by someone who practises in it.
-
-## Brand
-
-Scheme: espresso ground (#150E08), hot amber accent (#E3A64F), and a flame
-gradient (#F6C45A - #E2703A - #B33A2B) reserved for the brand rule and the
-expedite timeline. Heat is the motif; the flame gradient is never used for
-ordinary borders or text.
-
-One mark: the CLEAR TO CARRY lockup, set in Cormorant Garamond over a ghosted
-numeral 2, underlined with the flame rule, with PISTOL LICENSING SERVICE
-beneath. There is no
-separate crest. Three typefaces total and no more: Cormorant Garamond for
-display, Inter for body, IBM Plex Mono for labels and eyebrows. Adding a
-fourth is how a brand stops looking like one.
-
-## Booking
-
-The consultation is free. It is the only thing a visitor books from the site,
-and nothing on the site quotes a fee for anything else — representation is
-scoped and quoted in that conversation. Every consultation button routes
-through one switch:
-
-    NEXT_PUBLIC_BOOKING_URL
-
-**Set it** to a scheduling link — Calendly, Booksy, Acuity, Square Appointments
-— and every button opens that page for the visitor to pick a time. Create the
-event type as a **free** event: do not connect Stripe or PayPal to it. The
-screening answers travel with the visitor (sessionStorage) and reach you with
-the consultation request, so you open the call already knowing the file.
-
-**Leave it empty** and the buttons fall back to the site's own consultation
-request form: name, phone, optional email, what they want to protect, and a
-note. It POSTs to /api/lead, which emails you and appends to
-`data/leads.json`. Nothing breaks; it is just that you do the scheduling.
-
-Either way the office phone number stays visible in the nav and under every
-screening result, because some people would rather just call.
-
-## Updates (blog)
-
-The blog is the lead-generation surface: someone searching "NYC gun licence
-arrest record" lands on a post, reads a plain-language answer, and the free
-consultation is one click away.
-
-To add a post:
-
-1. Add an entry to `BLOG_META` in `lib/schema.js` — slug, date (`YYYY-MM-DD`),
-   and a short tag. Newest first; that array is the display order.
-2. Add the matching `blog["<slug>"]` entry to **all three** locale files with
-   `title`, `dek` and a `body` array of paragraphs. A slug present in one
-   language and missing from another fails the build, which is deliberate.
-3. Routes, metadata, hreflang, sitemap entries and BlogPosting structured data
-   are generated from those two things. There is nothing else to wire up.
-
-Keep posts to published law and process. No case outcomes, no predictions, and
-each post carries the general-commentary disclaimer from
-`blogPage.legal` — advertising rules do not stop applying because it is a blog.
-
-## Hero photograph
-
-The hero is built to take a real colour photograph. Drop a licensed image at
-`public/hero-nyc.jpg` and it takes over the hero background automatically —
-no code change. Until that file exists the layer is simply empty and the drawn
-skyline and Liberty show through, so the hero is never broken while you are
-sourcing the shot.
-
-- Landscape, about 2400px wide, shot toward Lower Manhattan or Liberty Island.
-- Golden hour or blue hour sits best against the palette; a flat grey midday
-  sky fights it.
-- A dark scrim is layered over the photo automatically so the headline stays
-  legible. You do not need to darken the image yourself.
-- To nudge the crop, change `background-position` on `.v-herophoto` in
-  `app/globals.css`.
-
-**Licensing matters here.** This is a law firm's advertising. Buy a licence
-(Getty, Adobe Stock, Stocksy), commission a local photographer, or use a shot
-you took yourself. Do not pull one off a search engine — a stock-photo demand
-letter is an expensive way to save $50.
-
-## Before launch, in order
-
-1. Substantiate the figures in `results` in `lib/locales/*` — keep records of
-   applications filed and approved, and update `asOf` when you refresh them. If
-   a figure cannot be proven from your own files, lower it or delete it. (No
-   fee appears anywhere on the site, so nothing here binds you for 30 days
-   under RPC 7.1. If you ever add one, that rule applies.)
-3. Replace placeholder testimonials and approval specimens on `/reviews` with
-   real, consented client material.
-4. Add your professional portrait (replace the photo frame block in
-   `app/attorney/page.jsx`).
-5. Add the hero photograph (see above). The person in `public/hero-nyc.jpg`
-   is the attorney himself, confirmed. Keep it that way: under RPC 7.1 a
-   non-lawyer portraying the lawyer has to be disclosed as such, so swapping
-   in a model or a stock photo later means adding that disclosure.
-6. Sign up at resend.com (free), verify your domain, put the API key and
-   NOTIFY_EMAIL in `.env`. Until then, notifications only print to the server log.
-7. Review `/privacy` wording.
-
-## Disclaimers (RPC 7.1)
-
-These are content, not decoration; if you edit the copy, keep them.
-
-- **"Attorney Advertising"** renders above the footer fine print on every page
-  (`common.attorneyAdvertising` via `Footer` in `lib/ui.jsx`). The rule requires
-  it on the home page; site-wide is simply easier to keep true.
-- **Footer fine print** (`footer.legal`) carries prior results, testimonials,
-  no attorney-client relationship, who decides licences, and timelines. It is
-  on every page because `Footer` is.
-- **Page-level fine print**, for the pages that make their own claims:
-  `home.legal` (timelines and the do-it-yourself comparison),
-  `attorney.legal`, `whyPage.legal`, `rightsPage.legal`, `faqPage.legal`,
-  `blogPage.legal` (general commentary, not advice),
-  `apply.screeningLegal` and `apply.consultLegal` (the screening is not
-  advice; the form creates no relationship), and `resultsDisclaimer` under
-  the figures on `/reviews`.
-- **No fee is advertised anywhere**, so nothing on the site binds you for 30
-  days. Add a figure and that rule starts applying to it.
-- **Nothing promises an outcome.** Keep it that way when you edit headlines:
-  "we get you licensed" is the sentence that creates the problem.
-
-The `97%` and `Hundreds` figures on `/reviews` are claims about your own
-files. Keep records that substantiate them and update `results.asOf`.
-
-## Domain-bound settings
-
-The production domain is assumed to be cleartocarrynyc.com in three places:
-`metadataBase` in `app/layout.jsx`, `app/sitemap.js`, and `app/robots.js`.
-Launching on a different domain means changing all three. The share card is
-`public/og.png` (regenerate if the brand changes); local-business structured
-data lives in `app/layout.jsx`.
-
-## Deploy
-
-Needs a persistent disk (JSON storage + uploads), so use Railway, Render, or a
-small VPS, not serverless Vercel:
-
-- Railway: railway.app -> New Project -> Deploy from repo -> add a Volume mounted
-  at /data -> set env vars DATA_DIR=/data and UPLOAD_DIR=/data/uploads -> done.
-- Any VPS: `npm run build && npm start` behind Caddy or nginx for HTTPS.
-
-Point cleartocarrynyc.com (or your chosen domain) at it.
-
-## Attorney workflow (no admin UI yet, by design)
-
-- Leads land in `data/leads.json` and your inbox. Call fast.
-- Every lead is a free consultation request. Quote the engagement on the call
-  and send the engagement letter yourself; the site takes no payment and names
-  no figure.
-- To record a retainer / advance status / mark filed, edit `data/clients.json`
-  (fields: paymentVerified, phase, filedAt, appStatus 0-3) or ask Claude Code to
-  build the admin screen next.
+Without SMTP settings, emails are printed to the server log instead of sent.
 
 ## Security notes
 
-- Uploads are validated by type and size and stored outside the web root; they
-  are never publicly served.
-- HTTPS at the proxy is mandatory before real client documents flow.
-- The portal link is the client id in localStorage; production hardening step
-  for later: emailed magic links instead.
+- The consultation fee and quotes are set on the server or by the attorney, never by the browser.
+- Clients cannot open steps out of order, upload before their portal is opened, or mark files filed.
+- Uploads are type- and size-checked, stored outside the web root, and downloadable only from `/admin`.
+- The portal link works like a password. It is emailed only to the client, and the page sends no referrer.
+- `/admin` and `/api` are excluded from search engines.
+
+## Domain-bound settings
+
+The production domain is cleartocarrynyc.com in `app/layout.jsx` (metadataBase),
+`lib/meta.js`, `app/sitemap.js` and `app/robots.js`.

@@ -1,27 +1,20 @@
-import fs from "fs";
-import path from "path";
 import Link from "next/link";
-import { Nav, Footer, Eyebrow, Skyline, Liberty, Wordmark, LicenseIcon, LicenseCard, ClockIcon, FileCheckIcon } from "@/lib/ui";
+import { Nav, Footer, Eyebrow, Wordmark } from "@/lib/ui";
 import { getDict, lp } from "@/lib/i18n";
 import HtmlLang from "@/lib/htmllang";
-
-/* A real photograph, when supplied, replaces the drawn skyline and Liberty
-   rather than stacking a second horizon on the real one. */
-const heroPhoto = fs.existsSync(path.join(process.cwd(), "public", "hero-nyc.jpg"));
 
 export default function Home({ lang = "en" }) {
   const t = getDict(lang);
   const h = t.home;
+  const w = t.whyPage;
   return (
     <div>
       <HtmlLang lang={lang} />
       <Nav lang={lang} />
 
-      <section className={"v-hero" + (heroPhoto ? " v-heroshot" : "")}>
-        {heroPhoto && <div className="v-herophoto" aria-hidden="true" />}
-        <div className="v-heroscrim" aria-hidden="true" />
+      <section className="v-hero">
         <div className="v-heroinner">
-          <Wordmark size={1} lang={lang} />
+          <Wordmark size={0.9} lang={lang} />
           <h1 className="v-h1">
             {h.heroH1a}
             <br />
@@ -34,8 +27,6 @@ export default function Home({ lang = "en" }) {
           </div>
           <div className="v-heronote">{h.heroNote}</div>
         </div>
-        {!heroPhoto && <Liberty className="v-liberty" />}
-        {!heroPhoto && <Skyline />}
       </section>
 
       <section className="v-amend" data-reveal>
@@ -47,85 +38,51 @@ export default function Home({ lang = "en" }) {
         <div className="v-amendnote">{h.amendNote}</div>
       </section>
 
-      <section className="v-expedite" data-reveal>
-        <div className="v-expediteinner">
-          <Eyebrow style={{ textAlign: "center" }}>{h.expediteEyebrow}</Eyebrow>
-          <h2 className="v-h2" style={{ textAlign: "center" }}>
-            {h.expediteH2a}
-            <br />
-            <em className="v-goldem">{h.expediteH2b}</em>
-          </h2>
-          <p className="v-lede v-ledesm" style={{ margin: "0 auto 46px", textAlign: "center" }}>{h.expediteLede}</p>
-
-          <div className="v-ruler" aria-hidden="true">
-            <span>{h.rulerStart}</span><span>6</span><span>12</span><span>18+</span>
-          </div>
-
-          <div className="v-track2r v-trackdiy">
-            <div className="v-tracklabel">{h.trackDiy}</div>
-            <div className="v-trackbar v-bardiy" aria-hidden="true" />
-            <ol className="v-trackstops">
-              {h.trackDiyStops.map((s, i) => (
-                <li key={i} className={i === h.trackDiyStops.length - 1 ? "v-stopdead" : undefined}>{s}</li>
-              ))}
-            </ol>
-          </div>
-
-          <div className="v-track2r v-trackus">
-            <div className="v-tracklabel v-goldtext">{h.trackUs}</div>
-            <div className="v-trackbar v-barflame" aria-hidden="true" />
-            <ol className="v-trackstops">
-              {h.trackUsStops.map((s, i) => <li key={i}>{s}</li>)}
-            </ol>
-            <div className="v-trackcardslot">
-              <LicenseCard className="v-trackcard" />
-              <div className="v-tracksaved">{h.trackSaved}</div>
-            </div>
-          </div>
-
-          <p className="v-expeditefoot">{h.expediteFoot}</p>
+      <section className="v-section" data-reveal>
+        <div className="v-sectionhead">
+          <Eyebrow>{h.compareEyebrow}</Eyebrow>
+          <h2 className="v-h2">{h.expediteH2a} <em className="v-goldem">{h.expediteH2b}</em></h2>
+          <p className="v-lede v-ledesm">{h.expediteLede}</p>
         </div>
+        <div className="v-comparegrid">
+          <div className="v-comparecol v-dim">
+            <div className="v-comparehead">{w.diyHead}</div>
+            <ul className="v-list">{w.diy.map((li, i) => <li key={i}>{li}</li>)}</ul>
+          </div>
+          <div className="v-comparecol v-lit">
+            <div className="v-comparehead v-goldtext">{w.usHead}</div>
+            <ul className="v-list">{w.us.map((li, i) => <li key={i}>{li}</li>)}</ul>
+          </div>
+        </div>
+        <p className="v-sectionfoot">{h.expediteFoot}</p>
       </section>
 
-      <section className="v-whofor" data-reveal>
-        <div className="v-whoforinner">
-          <Eyebrow style={{ textAlign: "center" }}>{h.whoEyebrow}</Eyebrow>
-          <h2 className="v-h2" style={{ textAlign: "center" }}>
-            {h.whoH2a}
-            <br />
-            <em className="v-goldem">{h.whoH2b}</em>
-          </h2>
-          <div className="v-whogrid">
-            <div className="v-whocard">
-              <ClockIcon />
-              <div className="v-whotitle">{h.whoCard1Title}</div>
-              <p className="v-whotext">{h.whoCard1Text}</p>
-            </div>
-            <div className="v-whocard">
-              <FileCheckIcon />
-              <div className="v-whotitle">{h.whoCard2Title}</div>
-              <p className="v-whotext">{h.whoCard2Text}</p>
-            </div>
+      <section className="v-section v-section--rule" data-reveal>
+        <div className="v-sectionhead">
+          <Eyebrow>{h.whoEyebrow}</Eyebrow>
+          <h2 className="v-h2">{h.whoH2a} <em className="v-goldem">{h.whoH2b}</em></h2>
+        </div>
+        <div className="v-cards2">
+          <div className="v-card">
+            <div className="v-cardtitle">{h.whoCard1Title}</div>
+            <p className="v-cardtext">{h.whoCard1Text}</p>
           </div>
-          <div className="v-whocta">
-            <p className="v-whoclose">{h.whoClose}</p>
-            <div className="v-herobtns">
-              <Link className="v-gold" href={lp(lang, "/apply")}>{t.common.freeScreening}</Link>
-              <Link className="v-quiet" href={lp(lang, "/apply?view=consult")}>{t.common.getStarted99}</Link>
-            </div>
+          <div className="v-card">
+            <div className="v-cardtitle">{h.whoCard2Title}</div>
+            <p className="v-cardtext">{h.whoCard2Text}</p>
           </div>
         </div>
       </section>
 
-      <section className="v-licenses" data-reveal>
-        <div className="v-licenseshead">
-          <div className="v-eyebrow">{h.licensesEyebrow}</div>
-          <h2 className="v-h2" style={{ marginBottom: 0 }}>{h.licensesH2}</h2>
+      <section className="v-section v-section--rule" data-reveal>
+        <div className="v-sectionhead">
+          <Eyebrow>{h.licensesEyebrow}</Eyebrow>
+          <h2 className="v-h2">{h.licensesH2}</h2>
         </div>
         <div className="v-licensegrid">
           {t.packages.map((p) => (
-            <Link href={lp(lang, "/apply?view=packages")} className={"v-license" + (p.featured ? " v-licensefeat" : "")} key={p.id}>
-              <LicenseIcon name={p.icon} />
+            <Link href={lp(lang, "/apply?view=packages")} className="v-license" key={p.id}>
+              <div className="v-licensetier">{p.tier}</div>
               <div className="v-licensename">{p.name}</div>
               <div className="v-licenseline">{p.line}</div>
             </Link>
@@ -133,7 +90,35 @@ export default function Home({ lang = "en" }) {
         </div>
       </section>
 
-      <section className="v-steps" data-reveal>
+      <section className="v-consultband" data-reveal>
+        <div className="v-consultin">
+          <div>
+            <Eyebrow>{h.consultEyebrow}</Eyebrow>
+            <h2 className="v-h2">{h.consultH2}</h2>
+            <p className="v-body">{h.consultText}</p>
+          </div>
+          <div className="v-consultaside">
+            <div className="v-price">$159</div>
+            <div className="v-pricenote">{t.apply.consultFeeNote}</div>
+            <Link className="v-gold v-w100" href={lp(lang, "/apply?view=consult")}>{t.common.getStarted99}</Link>
+            <Link className="v-quiet v-w100" href={lp(lang, "/apply")}>{t.common.freeScreening}</Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="v-section" data-reveal>
+        <div className="v-attorneyrow">
+          <img className="v-portrait" src="/manny-zayrov.jpg" alt="Manny Zayrov, Esq., Zayrov Law, P.C." />
+          <div>
+            <Eyebrow>{h.attorneyEyebrow}</Eyebrow>
+            <h2 className="v-h2">{h.attorneyH2}</h2>
+            <p className="v-body">{h.attorneyText}</p>
+            <Link className="v-textlink" href={lp(lang, "/attorney")}>{h.attorneyCta} →</Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="v-section v-section--rule" data-reveal>
         <div className="v-stepsgrid">
           {h.steps.map((s) => (
             <div className="v-step" key={s.n}>
@@ -154,18 +139,16 @@ export default function Home({ lang = "en" }) {
         ))}
       </div>
 
-      <p className="v-legal v-mt" style={{ maxWidth: "70ch", margin: "0 auto", padding: "0 22px" }}>
-        {h.legal}
-      </p>
-
       <section className="v-finalcta" data-reveal>
-        <h2 className="v-h2" style={{ marginBottom: 24 }}>
+        <h2 className="v-h2">
           {h.finalH2a}
           <br />
           <em className="v-goldem">{h.finalH2b}</em>
         </h2>
         <Link className="v-gold" href={lp(lang, "/apply")}>{t.common.qualify60}</Link>
       </section>
+
+      <p className="v-legal v-legalwide">{h.legal}</p>
 
       <div className="v-stickycta">
         <span className="v-stickytext">{h.stickyText}</span>

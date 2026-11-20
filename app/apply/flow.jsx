@@ -1,11 +1,10 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
-import Link from "next/link";
-import { Eyebrow, LicenseIcon, BookLink } from "@/lib/ui";
-import { BOOKING_URL, PHONE, PHONE_TEL } from "@/lib/content";
+import { Eyebrow } from "@/lib/ui";
+import { BOOKING_URL, PHONE, PHONE_TEL, CONSULT_FEE, ZELLE_TO, money } from "@/lib/content";
 
-const GREEN = "#5FA97F", RED = "#D25A40", CHAMPAGNE = "#E3A64F";
+const GREEN = "#7FB592", RED = "#D27A6A", AMBER = "#C9A96A";
 
 function Field({ label, area, ...props }) {
   return (
@@ -13,6 +12,15 @@ function Field({ label, area, ...props }) {
       <span className="v-fieldlabel">{label}</span>
       {area ? <textarea className="v-input v-area" {...props} /> : <input className="v-input" {...props} />}
     </label>
+  );
+}
+
+/* Hidden from people, irresistible to spam bots. */
+function Honeypot({ value, onChange }) {
+  return (
+    <input type="text" name="company" tabIndex={-1} autoComplete="off" aria-hidden="true"
+      value={value} onChange={(e) => onChange(e.target.value)}
+      style={{ position: "absolute", left: "-9999px", width: 1, height: 1, opacity: 0 }} />
   );
 }
 
@@ -27,11 +35,18 @@ async function postJson(url, body, method = "POST") {
   return data;
 }
 
+function rememberClient(id) {
+  try { window.localStorage.setItem("ctc:clientId", id); } catch {}
+}
+
 /* ---------------- qualify ---------------- */
-function Qualify({ go, t }) {
+function Qualify({ go, t, lang }) {
   const QUALIFY = t.qualify;
   const [i, setI] = useState(0);
   const [picked, setPicked] = useState([]);
+  const [contact, setContact] = useState({ name: "", phone: "", email: "", company: "" });
+  const [sent, setSent] = useState(false);
+  const [err, setErr] = useState("");
   const headingRef = useRef(null);
 
   useEffect(() => { if (headingRef.current) headingRef.current.focus(); }, [i]);
@@ -66,12 +81,6 @@ function Qualify({ go, t }) {
   const yellows = picked.filter((p) => p.grade === "y");
   const light = reds.length ? "red" : yellows.length ? "yellow" : "green";
   const notes = [...reds, ...yellows].filter((p) => p.note);
-
-  /* The answers ride along to the consultation request, which is where a name
-     and a phone number finally exist, so the attorney opens the call already
-     knowing the file. Nothing is posted from this screen: there would be
-     nobody to call back. sessionStorage covers the visitor who leaves for an
-     external scheduler and comes back to the form instead. */
   const screening = { light, answers: picked.map((p) => ({ id: p.id, answer: p.label })) };
 
   function toConsult() {
@@ -79,9 +88,19 @@ function Qualify({ go, t }) {
     go("consult", screening);
   }
 
+  async function callback() {
+    setErr("");
+    try {
+      await postJson("/api/lead", { ...contact, lang, kind: "callback", ...screening });
+      setSent(true);
+    } catch (e) {
+      setErr(e.message);
+    }
+  }
+
   const L = {
     green: { color: GREEN, badge: t.apply.resultGreenBadge, head: t.apply.resultGreenHead, body: t.apply.resultGreenBody },
-    yellow: { color: CHAMPAGNE, badge: t.apply.resultYellowBadge, head: t.apply.resultYellowHead, body: t.apply.resultYellowBody },
+    yellow: { color: AMBER, badge: t.apply.resultYellowBadge, head: t.apply.resultYellowHead, body: t.apply.resultYellowBody },
     red: { color: RED, badge: t.apply.resultRedBadge, head: t.apply.resultRedHead, body: t.apply.resultRedBody },
   }[light];
 
@@ -93,76 +112,66 @@ function Qualify({ go, t }) {
       {notes.length > 0 && (
         <div className="v-notes">
           {notes.map((n, k) => (
-            <div className="v-noteitem" key={k} style={{ borderLeftColor: n.grade === "r" ? RED : CHAMPAGNE }}>{n.note}</div>
+            <div className="v-noteitem" key={k} style={{ borderLeftColor: n.grade === "r" ? RED : AMBER }}>{n.note}</div>
           ))}
         </div>
       )}
+
       <div className="v-bookbox">
-        <div className="v-bookhead">
-          {light === "red"
-            ? t.apply.bookHeadRed
-            : t.apply.bookHead}
-        </div>
-        <BookLink className="v-gold v-w100" style={{ textAlign: "center" }}
-          onFallback={toConsult}
-          onNavigate={() => { try { sessionStorage.setItem("ctc:screening", JSON.stringify(screening)); } catch {} }}>
-          {t.common.getStarted99}
-        </BookLink>
-        <div className="v-bookfine">
-          {t.apply.bookFine}
-          {BOOKING_URL ? t.apply.bookFineScheduler : ""}
-        </div>
+        <div className="v-bookhead">{light === "red" ? t.apply.bookHeadRed : t.apply.bookHead}</div>
+        <button className="v-gold v-w100" onClick={toConsult}>{t.common.getStarted99}</button>
+        <div className="v-bookfine">{t.apply.bookFine}</div>
       </div>
+
+      {!sent ? (
+        <div className="v-leadbox">
+          <div className="v-leadhead">{t.apply.callbackHead}</div>
+          <Field label={t.apply.nameLabel} autoComplete="name" value={contact.name} onChange={(e) => setContact({ ...contact, name: e.target.value })} />
+          <Field label={t.apply.phone} inputMode="tel" autoComplete="tel" value={contact.phone} onChange={(e) => setContact({ ...contact, phone: e.target.value })} />
+          <Honeypot value={contact.company} onChange={(v) => setContact({ ...contact, company: v })} />
+          {err && <p className="v-err">{err}</p>}
+          <button className="v-quiet v-w100" onClick={callback} disabled={!contact.name.trim() || !contact.phone.trim()}>
+            {t.apply.callbackSubmit}
+          </button>
+        </div>
+      ) : (
+        <div className="v-leadbox"><div className="v-leadhead" style={{ color: GREEN }}>{t.apply.callbackSent}</div></div>
+      )}
 
       <div className="v-bookalt">
         {t.apply.bookAltPre}<a className="v-goldlink" href={PHONE_TEL}>{PHONE}</a>.
       </div>
-
-      <p className="v-legal v-mt">
-        {t.apply.screeningLegal}
-      </p>
+      <p className="v-legal v-mt">{t.apply.screeningLegal}</p>
     </div>
   );
 }
 
 /* ---------------- packages ----------------
-   Levels of support, not a price list. Every button here lands on the same
-   free consultation; what an engagement costs is quoted in that conversation. */
+   Levels of support. The consultation is the only fixed price; everything
+   else is quoted at the consultation, based on the applicant's record. */
 function Packages({ go, pickLicense, t }) {
-  const TIERS = t.tiers, PACKAGES = t.packages;
   const [showLicenses, setShowLicenses] = useState(false);
   return (
     <div className="v-page">
       <Eyebrow>{t.apply.packagesEyebrow}</Eyebrow>
       <h1 className="v-h1 v-h1sm">{t.apply.packagesH1}</h1>
-      <p className="v-lede v-ledesm">
-        {t.apply.packagesLede}
-      </p>
+      <p className="v-lede v-ledesm">{t.apply.packagesLede}</p>
       <div className="v-tiers">
-        {TIERS.map((tier) => (
-          <div key={tier.id} className={"v-pack v-tier" + (tier.featured ? " v-packfeat" : "")}>
-            {tier.featured && <div className="v-featribbon">{t.apply.mostEngaged}</div>}
+        {t.tiers.map((tier) => (
+          <div key={tier.id} className={"v-pack" + (tier.lead ? " v-packfeat" : "")}>
             <div className="v-packtier">{tier.tier}</div>
             <div className="v-packname">{tier.name}</div>
+            <div className={"v-packprice" + (tier.priceLabel ? "" : " v-packprice--quoted")}>{tier.priceLabel || t.apply.quoted}</div>
             <p className="v-packline">{tier.line}</p>
             <p className="v-packfor">{tier.for}</p>
-            {tier.lead && (
-              <button className="v-gold v-w100" onClick={() => go("consult")}>
-                {t.common.getStarted99}
-              </button>
-            )}
-            {!tier.lead && !tier.expands && (
-              <button className="v-quiet v-w100" onClick={() => go("consult")}>
-                {t.apply.startConsult}
-              </button>
-            )}
-            {tier.expands && (
-              <button className="v-gold v-w100" onClick={() => setShowLicenses((v) => !v)}>
+            {tier.expands ? (
+              <button className="v-quiet v-w100" onClick={() => setShowLicenses((v) => !v)}>
                 {showLicenses ? t.apply.hideLicence : t.apply.chooseLicence}
               </button>
-            )}
-            {tier.concierge && (
-              <button className="v-quiet v-w100" onClick={() => go("consult")}>{t.apply.startConsult}</button>
+            ) : (
+              <button className={(tier.lead ? "v-gold" : "v-quiet") + " v-w100"} onClick={() => go("consult")}>
+                {tier.lead ? t.common.getStarted99 : t.apply.startConsult}
+              </button>
             )}
           </div>
         ))}
@@ -170,22 +179,16 @@ function Packages({ go, pickLicense, t }) {
 
       {showLicenses && (
         <div className="v-licenseblock">
-          <div className="v-licensehead"><Eyebrow>{t.apply.licenceBlockEyebrow}</Eyebrow></div>
-          <p className="v-mutetext" style={{ maxWidth: "62ch" }}>
-            {t.apply.licenceBlockNote}
-          </p>
-          <div className="v-packs">
-            {PACKAGES.map((p) => (
-              <button key={p.id}
-                className={"v-pack v-packbtn" + (p.featured ? " v-packfeat" : "")}
-                onClick={() => pickLicense(p)}>
-                {p.featured && <div className="v-featribbon">{t.apply.flagship}</div>}
-                <LicenseIcon name={p.icon} />
-                <div className="v-packtier">{p.tier}</div>
-                <div className="v-packname">{p.name}</div>
-                <p className="v-packline">{p.line}</p>
-                <p className="v-packfor">{p.for}</p>
-                <span className={p.featured ? "v-gold v-w100 v-faux" : "v-quiet v-w100 v-faux"}>{t.apply.continue}</span>
+          <Eyebrow>{t.apply.licenceBlockEyebrow}</Eyebrow>
+          <p className="v-mutetext" style={{ maxWidth: "62ch" }}>{t.apply.licenceBlockNote}</p>
+          <div className="v-licensegrid">
+            {t.packages.map((p) => (
+              <button key={p.id} className="v-license" onClick={() => pickLicense(p)}>
+                <div className="v-licensetier">{p.tier}</div>
+                <div className="v-licensename">{p.name}</div>
+                <div className="v-licenseline">{p.line}</div>
+                <div className="v-licensefor">{p.for}</div>
+                <span className="v-textlink">{t.apply.continue} →</span>
               </button>
             ))}
           </div>
@@ -194,18 +197,16 @@ function Packages({ go, pickLicense, t }) {
 
       <div className="v-underpacks">
         <p className="v-mutetext">{t.apply.underPacks}</p>
-        <BookLink className="v-quiet" onFallback={() => go("consult")}>{t.common.getStarted99}</BookLink>
+        <button className="v-quiet" onClick={() => go("consult")}>{t.common.getStarted99}</button>
       </div>
     </div>
   );
 }
 
-/* ---------------- consultation ----------------
-   The only thing a visitor books from this site, and it is free. Screening
-   answers and the licence they were reading about ride along so the attorney
-   opens the call already knowing the file. */
-function Consult({ lic, screening, go, t }) {
-  const THIRD_PARTY_COSTS = t.thirdParty;
+/* ---------------- consultation booking ----------------
+   The one paid step on the site. Screening answers and the licence the visitor
+   was reading about ride along so the attorney opens the call knowing the file. */
+function Consult({ lic, screening, go, t, lang, onBooked }) {
   const [carried, setCarried] = useState(screening || null);
   useEffect(() => {
     if (carried) return;
@@ -214,26 +215,31 @@ function Consult({ lic, screening, go, t }) {
       if (saved) setCarried(JSON.parse(saved));
     } catch {}
   }, [carried]);
-  const [f, setF] = useState({ name: "", phone: "", email: "", note: "" });
+  const [f, setF] = useState({ name: "", phone: "", email: "", note: "", company: "" });
   const [interest, setInterest] = useState("");
-  const [sent, setSent] = useState(false);
+  const [ack, setAck] = useState(false);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
-  const ready = f.name.trim() && f.phone.trim();
+  const [booked, setBooked] = useState(null);
+  const ready = f.name.trim() && f.phone.trim() && /.+@.+\..+/.test(f.email.trim()) && ack;
 
   async function submit() {
     if (!ready || busy) return;
     setErr("");
     setBusy(true);
     try {
-      await postJson("/api/lead", {
+      const res = await postJson("/api/client", {
         ...f,
-        kind: "consult",
-        interest: interest || (lic ? lic.name : ""),
+        lang,
+        ack: true,
+        interest,
+        licence: lic ? lic.id : undefined,
         light: carried ? carried.light : undefined,
         answers: carried ? carried.answers : undefined,
       });
-      setSent(true);
+      rememberClient(res.id);
+      onBooked(res.id);
+      setBooked({ ...res, email: f.email.trim() });
       window.scrollTo(0, 0);
     } catch (e) {
       setErr(e.message);
@@ -242,20 +248,23 @@ function Consult({ lic, screening, go, t }) {
     }
   }
 
-  if (sent) {
+  if (booked) {
     return (
       <div className="v-page v-narrow">
         <div className="v-lightbadge" style={{ color: GREEN, borderColor: GREEN }}>{t.apply.consultSentEyebrow}</div>
-        <h1 className="v-h1 v-h1sm">{t.apply.consultSentH1}</h1>
-        <p className="v-lede v-ledesm">{t.apply.consultSentBody}</p>
-        <a className="v-gold v-w100" style={{ textAlign: "center" }} href={PHONE_TEL}>
-          {t.apply.consultCallNow} · {PHONE}
-        </a>
+        <h1 className="v-h1 v-h1sm">{t.apply.bookedH1}</h1>
+        <div className="v-zellecard">
+          <div className="v-zellehead">{t.apply.zelleHead}</div>
+          <div className="v-zellerow"><span>{t.apply.zelleTo}</span><strong>{ZELLE_TO}</strong></div>
+          <div className="v-zellerow"><span>{t.apply.zelleAmount}</span><strong>{money(CONSULT_FEE)}</strong></div>
+          <div className="v-zellerow"><span>{t.apply.zelleMemo}</span><strong>{booked.ref}</strong></div>
+          <p className="v-zellenote">{t.apply.zelleNote} {booked.email}.</p>
+        </div>
+        <p className="v-lede v-ledesm">{t.apply.bookedBody}</p>
         {BOOKING_URL && (
-          <BookLink className="v-quiet v-w100 v-mt" style={{ textAlign: "center" }}>
-            {t.apply.bookFineScheduler.replace(/^\s*·\s*/, "")}
-          </BookLink>
+          <a className="v-gold v-w100" href={BOOKING_URL} target="_blank" rel="noopener noreferrer">{t.apply.schedulerCta}</a>
         )}
+        <a className={(BOOKING_URL ? "v-quiet v-mt" : "v-gold") + " v-w100"} href={PHONE_TEL}>{t.apply.consultCallNow} · {PHONE}</a>
         <p className="v-legal v-mt">{t.apply.consultLegal}</p>
       </div>
     );
@@ -268,20 +277,19 @@ function Consult({ lic, screening, go, t }) {
       <h1 className="v-h1 v-h1sm">{t.apply.consultH1}</h1>
       <p className="v-lede v-ledesm">{t.apply.consultLede}</p>
 
-      {BOOKING_URL && (
-        <div className="v-bookbox">
-          <div className="v-bookhead">{t.apply.bookHead}</div>
-          <BookLink className="v-gold v-w100" style={{ textAlign: "center" }}>
-            {t.common.getStarted99}
-          </BookLink>
-          <div className="v-bookfine">{t.apply.bookFine}{t.apply.bookFineScheduler}</div>
+      <div className="v-feebox">
+        <div>
+          <div className="v-feelabel">{t.apply.consultFeeLabel}</div>
+          <div className="v-feenote">{t.apply.consultFeeNote}</div>
         </div>
-      )}
+        <div className="v-feeamt">{money(CONSULT_FEE)}</div>
+      </div>
 
       <div className="v-form">
-        <Field label={t.apply.nameLabel} value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} />
-        <Field label={t.apply.phone} inputMode="tel" value={f.phone} onChange={(e) => setF({ ...f, phone: e.target.value })} />
-        <Field label={t.apply.emailLabel} inputMode="email" value={f.email} onChange={(e) => setF({ ...f, email: e.target.value })} />
+        <Field label={t.apply.nameLabel} autoComplete="name" value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} />
+        <Field label={t.apply.phone} inputMode="tel" autoComplete="tel" value={f.phone} onChange={(e) => setF({ ...f, phone: e.target.value })} />
+        <Field label={t.apply.emailLabel} type="email" autoComplete="email" value={f.email} onChange={(e) => setF({ ...f, email: e.target.value })} />
+        <Honeypot value={f.company} onChange={(v) => setF({ ...f, company: v })} />
 
         <div className="v-field">
           <span className="v-fieldlabel">{t.apply.consultInterest}</span>
@@ -300,34 +308,31 @@ function Consult({ lic, screening, go, t }) {
         <Field area rows={3} label={t.apply.consultNote} value={f.note}
           onChange={(e) => setF({ ...f, note: e.target.value })} />
 
-        {err && <p className="v-mutetext" style={{ color: RED }}>{err}</p>}
+        <label className="v-ack">
+          <input type="checkbox" checked={ack} onChange={(e) => setAck(e.target.checked)} />
+          <span>{t.apply.consultAck}</span>
+        </label>
+
+        {err && <p className="v-err">{err}</p>}
         <button className="v-gold v-w100" onClick={submit} disabled={!ready || busy}>
           {busy ? t.apply.portalSending : t.apply.consultSubmit}
         </button>
         <div className="v-bookalt">
-          {t.apply.bookAltPre}<a className="v-goldlink" href={PHONE_TEL}>{PHONE}</a>.
+          {t.apply.zelleOther} <a className="v-goldlink" href={PHONE_TEL}>{PHONE}</a>.
         </div>
       </div>
 
-      <div className="v-costs" style={{ marginTop: 34 }}>
+      <div className="v-costs">
         <Eyebrow>{t.apply.costsEyebrow}</Eyebrow>
-        <h2 className="v-h2" style={{ marginBottom: 14 }}>{t.apply.costsH2}</h2>
-        <p className="v-mutetext" style={{ maxWidth: "62ch", marginBottom: 22 }}>
-          {t.apply.costsLede}
-        </p>
+        <h2 className="v-h2">{t.apply.costsH2}</h2>
+        <p className="v-mutetext" style={{ maxWidth: "62ch", marginBottom: 22 }}>{t.apply.costsLede}</p>
         <div className="v-costlist">
-          {THIRD_PARTY_COSTS.map((c) => (
+          {t.thirdParty.map((c) => (
             <div className="v-costrow" key={c.id}>
               <div className="v-costname">{c.name}</div>
               <div className="v-costnote">{c.note}</div>
             </div>
           ))}
-        </div>
-        <div className="v-costincluded">
-          <span className="v-costincludedmark" aria-hidden="true">✓</span>
-          <span>
-            {t.apply.costsIncludedPre}<strong>{t.apply.costsIncluded}</strong>{t.apply.costsIncludedPost}
-          </span>
         </div>
       </div>
 
@@ -337,10 +342,11 @@ function Consult({ lic, screening, go, t }) {
 }
 
 /* ---------------- portal ---------------- */
-function Portal({ clientId, go, t }) {
+function Portal({ clientId, t }) {
   const PHASES = t.phases;
   const [c, setC] = useState(null);
   const [err, setErr] = useState("");
+  const [loadFailed, setLoadFailed] = useState(false);
   const fileInputRef = useRef(null);
   const [pendingItem, setPendingItem] = useState(null);
   const [busy, setBusy] = useState(false);
@@ -348,12 +354,44 @@ function Portal({ clientId, go, t }) {
   useEffect(() => {
     fetch("/api/client?id=" + encodeURIComponent(clientId))
       .then((r) => r.json())
-      .then((d) => (d.error ? setErr(d.error) : setC(d)))
-      .catch(() => setErr(t.apply.portalLoadErr));
+      .then((d) => (d.error ? setLoadFailed(true) : setC(d)))
+      .catch(() => setLoadFailed(true));
   }, [clientId]);
 
-  if (err) return <div className="v-page v-narrow"><p className="v-lede v-ledesm">{err}</p></div>;
+  if (loadFailed) return (
+    <div className="v-page v-narrow">
+      <p className="v-lede v-ledesm">{t.apply.portalLoadErr}</p>
+      <a className="v-gold" href={PHONE_TEL}>{PHONE}</a>
+    </div>
+  );
   if (!c) return <div className="v-page v-narrow"><p className="v-mutetext">{t.apply.portalOpening}</p></div>;
+
+  const firstName = c.name.split(" ")[0];
+
+  if (!c.portalOpen) {
+    return (
+      <div className="v-page v-narrow">
+        <Eyebrow>{t.apply.portalEyebrow}</Eyebrow>
+        <h1 className="v-h1 v-h1sm">{firstName}, {t.apply.portalPendingH1}</h1>
+        <div className="v-portalmeta">
+          {t.apply.portalRef} {c.ref} ·{" "}
+          {c.consultPaid
+            ? <span style={{ color: GREEN }}>{t.apply.portalConsultPaid}</span>
+            : <span style={{ color: AMBER }}>{t.apply.portalConsultPending}</span>}
+        </div>
+        <p className="v-lede v-ledesm">{t.apply.portalPendingBody}</p>
+        {!c.consultPaid && (
+          <div className="v-zellecard">
+            <div className="v-zellehead">{t.apply.zelleHead}</div>
+            <div className="v-zellerow"><span>{t.apply.zelleTo}</span><strong>{ZELLE_TO}</strong></div>
+            <div className="v-zellerow"><span>{t.apply.zelleAmount}</span><strong>{money(CONSULT_FEE)}</strong></div>
+            <div className="v-zellerow"><span>{t.apply.zelleMemo}</span><strong>{c.ref}</strong></div>
+          </div>
+        )}
+        <a className="v-quiet" href={PHONE_TEL}>{PHONE}</a>
+      </div>
+    );
+  }
 
   const currentPhase = PHASES.find((p) => p.id === c.phase) || PHASES[PHASES.length - 1];
   const phaseItems = currentPhase.items;
@@ -391,13 +429,12 @@ function Portal({ clientId, go, t }) {
   }
 
   async function advance() {
-    const d = await postJson("/api/client", { id: c.id, phase: c.phase + 1 }, "PATCH");
-    setC(d);
-  }
-
-  async function markFiled() {
-    const d = await postJson("/api/client", { id: c.id, filedAt: true }, "PATCH");
-    setC(d);
+    try {
+      setC(await postJson("/api/client", { id: c.id, advance: true }, "PATCH"));
+      window.scrollTo(0, 0);
+    } catch (ex) {
+      setErr(ex.message);
+    }
   }
 
   const ROMAN = ["I", "II", "III", "IV"];
@@ -406,17 +443,13 @@ function Portal({ clientId, go, t }) {
     <div className="v-page">
       <input type="file" ref={fileInputRef} style={{ display: "none" }} onChange={onFile}
         accept=".pdf,.jpg,.jpeg,.png,.heic,.heif,.webp" />
-      <div className="v-portalhead">
-        <div>
-          <Eyebrow>{t.apply.portalEyebrow}</Eyebrow>
-          <h1 className="v-h1 v-h1sm">{c.name.split(" ")[0]}, {t.apply.portalFileOpen}</h1>
-          <div className="v-portalmeta">
-            {c.packageName} · {t.apply.portalRef} {c.ref} ·{" "}
-            {c.paymentVerified
-              ? <span style={{ color: GREEN }}>{t.apply.portalPaid}</span>
-              : <span style={{ color: CHAMPAGNE }}>{t.apply.portalPending}</span>}
-          </div>
-        </div>
+      <Eyebrow>{t.apply.portalEyebrow}</Eyebrow>
+      <h1 className="v-h1 v-h1sm">{firstName}, {t.apply.portalFileOpen}</h1>
+      <div className="v-portalmeta">
+        {c.packageName} · {t.apply.portalRef} {c.ref} ·{" "}
+        {c.paymentVerified
+          ? <span style={{ color: GREEN }}>{t.apply.portalPaid}</span>
+          : <span style={{ color: AMBER }}>{t.apply.portalPending}</span>}
       </div>
 
       <div className="v-progressblock">
@@ -436,7 +469,7 @@ function Portal({ clientId, go, t }) {
 
       <div className="v-phasecard">
         <div className="v-phasebrief">{currentPhase.brief}</div>
-        {err && <p className="v-mutetext" style={{ color: RED }}>{err}</p>}
+        {err && <p className="v-err">{err}</p>}
         {phaseItems.map((it) => {
           const doc = docs[it.id];
           return (
@@ -455,20 +488,13 @@ function Portal({ clientId, go, t }) {
         })}
         {phaseComplete && c.phase < PHASES.length && (
           <div className="v-phasedonebox">
-            <p className="v-phasedonetext">
-              {currentPhase.name} {t.apply.portalPhaseDone}
-            </p>
+            <p className="v-phasedonetext">{currentPhase.name} {t.apply.portalPhaseDone}</p>
             <button className="v-gold" onClick={advance}>{t.apply.portalOpenNext} {ROMAN[c.phase]}</button>
           </div>
         )}
         {phaseComplete && c.phase === PHASES.length && (
           <div className="v-phasedonebox">
-            <p className="v-phasedonetext" style={{ color: GREEN }}>
-              {t.apply.portalAssembled}
-            </p>
-            {!c.filedAt && (
-              <button className="v-gold" onClick={markFiled}>{t.apply.portalMarkFiled}</button>
-            )}
+            <p className="v-phasedonetext" style={{ color: GREEN }}>{t.apply.portalAssembled}</p>
           </div>
         )}
       </div>
@@ -481,7 +507,7 @@ function Portal({ clientId, go, t }) {
         const overdue = remaining <= 0;
         return (
           <div className="v-trackercard">
-            <div className="v-trackerhead"><Eyebrow>{t.apply.trackerEyebrow}</Eyebrow></div>
+            <Eyebrow>{t.apply.trackerEyebrow}</Eyebrow>
             <div className="v-stages">
               {STAGES.map((s, k) => (
                 <div key={k} className={"v-stage" + (k < stage ? " v-stagedone" : k === stage ? " v-stagenow" : "")}>
@@ -490,49 +516,38 @@ function Portal({ clientId, go, t }) {
               ))}
             </div>
             <div className="v-clock">
-              <div className="v-clockdays" style={{ color: overdue ? RED : CHAMPAGNE }}>{t.apply.trackerDay} {days}</div>
+              <div className="v-clockdays" style={{ color: overdue ? RED : AMBER }}>{t.apply.trackerDay} {days}</div>
               <div className="v-clocklabel">
-                {overdue
-                  ? t.apply.trackerOverdue
-                  : `${t.apply.trackerOf180} ${remaining} ${t.apply.trackerRemain}`}
+                {overdue ? t.apply.trackerOverdue : `${t.apply.trackerOf180} ${remaining} ${t.apply.trackerRemain}`}
               </div>
             </div>
             {overdue && (
               <div className="v-art78">
                 <div className="v-art78head">{t.apply.art78Head}</div>
-                <p className="v-art78text">
-                  {t.apply.art78Text}
-                </p>
+                <p className="v-art78text">{t.apply.art78Text}</p>
                 <a className="v-gold v-sm" href={PHONE_TEL}>{t.apply.art78Cta} {PHONE}</a>
               </div>
             )}
-            <p className="v-mutetext" style={{ marginTop: 16, marginBottom: 0 }}>
-              {t.apply.trackerFoot}
-            </p>
+            <p className="v-mutetext" style={{ marginTop: 16, marginBottom: 0 }}>{t.apply.trackerFoot}</p>
           </div>
         );
       })()}
 
-      <div className="v-lifegrid">
-        <div className="v-lifecard">
-          <div className="v-lifehead">{t.apply.lifeHead1}</div>
-          <p className="v-lifetext">
-            {t.apply.lifeText1}
-          </p>
+      <div className="v-cards2">
+        <div className="v-card">
+          <div className="v-cardtitle">{t.apply.lifeHead1}</div>
+          <p className="v-cardtext">{t.apply.lifeText1}</p>
         </div>
-        <div className="v-lifecard">
-          <div className="v-lifehead">{t.apply.lifeHead2}</div>
-          <p className="v-lifetext">
-            {t.apply.lifeText2}
-          </p>
-          <a className="v-quiet v-sm" href={PHONE_TEL}>{t.apply.lifeCta2}</a>
+        <div className="v-card">
+          <div className="v-cardtitle">{t.apply.lifeHead2}</div>
+          <p className="v-cardtext">{t.apply.lifeText2}</p>
         </div>
       </div>
 
       <div className="v-concierge">
-        <div className="v-conciergetext">
+        <div>
           <div className="v-conciergehead">{t.apply.conciergeHead}</div>
-          {t.apply.conciergeText}
+          <div className="v-mutetext">{t.apply.conciergeText}</div>
         </div>
         <a className="v-quiet v-sm" href={PHONE_TEL}>{PHONE}</a>
       </div>
@@ -541,39 +556,42 @@ function Portal({ clientId, go, t }) {
 }
 
 /* ---------------- flow ---------------- */
-
-
 export default function Flow({ t, lang = "en" }) {
   const params = useSearchParams();
   const requested = params.get("view") || "qualify";
-  const [view, setView] = useState(requested === "quick" ? "consult" : requested);
+  const [view, setView] = useState(["qualify", "packages", "consult", "portal"].includes(requested) ? requested : "qualify");
   const [lic, setLic] = useState(null);
   const [screening, setScreening] = useState(null);
   const [clientId, setClientId] = useState(null);
 
   useEffect(() => {
-    const saved = typeof window !== "undefined" ? window.localStorage.getItem("ctc:clientId") : null;
+    const fromLink = params.get("id");
+    let saved = null;
+    try {
+      if (fromLink) window.localStorage.setItem("ctc:clientId", fromLink);
+      saved = fromLink || window.localStorage.getItem("ctc:clientId");
+    } catch {
+      saved = fromLink;
+    }
     if (saved) setClientId(saved);
-    if (params.get("view") === "portal" && saved) setView("portal");
   }, [params]);
 
   const go = (v, extra) => {
-    if (v === "portal" && !clientId) return setView("packages");
     if (v === "consult" && extra) setScreening(extra);
-    setView(v === "quickcheckout" ? "consult" : v);
+    setView(v);
     window.scrollTo(0, 0);
   };
 
   const pickLicense = (p) => { setLic(p); setView("consult"); window.scrollTo(0, 0); };
 
-  const packagesView = <Packages go={go} pickLicense={pickLicense} t={t} />;
-
   return (
     <>
-      {view === "qualify" && <Qualify go={go} t={t} />}
-      {view === "packages" && packagesView}
-      {view === "consult" && <Consult lic={lic} screening={screening} go={go} t={t} />}
-      {view === "portal" && (clientId ? <Portal clientId={clientId} go={go} t={t} /> : packagesView)}
+      {view === "qualify" && <Qualify go={go} t={t} lang={lang} />}
+      {view === "packages" && <Packages go={go} pickLicense={pickLicense} t={t} />}
+      {view === "consult" && <Consult lic={lic} screening={screening} go={go} t={t} lang={lang} onBooked={setClientId} />}
+      {view === "portal" && (clientId
+        ? <Portal clientId={clientId} t={t} />
+        : <Packages go={go} pickLicense={pickLicense} t={t} />)}
     </>
   );
 }
