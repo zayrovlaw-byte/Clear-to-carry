@@ -23,6 +23,29 @@ firm's Gmail / Google Workspace account, and an attorney dashboard at `/admin`.
 6. **Filing**: tick *Filed*, then move the status. The client's portal shows the
    stage and the 180-day clock, and each change emails them.
 
+## Card payments (Stripe)
+
+Clients can pay the $159 consultation and, after you quote, the retainer balance by
+card through Stripe Checkout (Stripe's own secure payment page; card numbers never
+touch this site). Zelle stays available as the alternative. The card buttons appear
+only when `STRIPE_SECRET_KEY` is set.
+
+1. Create a Stripe account in the firm's name and connect the firm's **operating**
+   account for payouts (see the note on client funds below).
+2. Developers -> API keys: copy the secret key into `STRIPE_SECRET_KEY`.
+3. Developers -> Webhooks -> Add endpoint: `https://cleartocarrynyc.com/api/stripe/webhook`,
+   events `checkout.session.completed` and `checkout.session.async_payment_succeeded`.
+   Copy the signing secret into `STRIPE_WEBHOOK_SECRET`.
+4. Test with a `sk_test_` key and card 4242 4242 4242 4242 before switching to the live key.
+
+A card payment marks the consultation or retainer paid automatically, emails the
+client, emails you, and shows in the dashboard as "Card · $amount".
+
+Client funds: if a retainer is an advance on fees not yet earned, NY rules may
+require it to be held in the firm's IOLA/escrow account, and card processing fees
+cannot be taken out of client funds. Confirm how the firm treats these retainers
+before pointing card retainer payouts at an operating account.
+
 ## Attorney dashboard: `/admin`
 
 Sign in with `ADMIN_PASSWORD`. Two tabs:
@@ -65,7 +88,7 @@ Clients upload documents, so the site needs a server with a disk. Vercel won't w
 ## Before launch
 
 1. Set `ADMIN_PASSWORD` (10+ characters), `SMTP_USER`, `SMTP_PASS` (a Google app
-   password), `NOTIFY_EMAIL`, `NEXT_PUBLIC_ZELLE_TO`, `SITE_URL`.
+   password), `NOTIFY_EMAIL`, `NEXT_PUBLIC_ZELLE_TO`, `SITE_URL`, and the two Stripe keys.
 2. Book a test consultation yourself and check both emails arrive.
 3. Have a native speaker read the Spanish and Russian disclaimers and pricing text.
 4. Turn on Railway volume backups: `/data` holds client documents.

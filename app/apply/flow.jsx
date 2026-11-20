@@ -39,6 +39,31 @@ function rememberClient(id) {
   try { window.localStorage.setItem("ctc:clientId", id); } catch {}
 }
 
+/* Card payment: the server works out what is due and returns a Stripe
+   Checkout page; the client is sent there and comes back to their portal. */
+function PayCard({ clientId, kind, label, t, className = "v-gold v-w100 v-paycard" }) {
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState("");
+  async function go() {
+    setBusy(true);
+    setErr("");
+    try {
+      const { url } = await postJson("/api/pay", { id: clientId, kind });
+      window.location.href = url;
+    } catch (e) {
+      setErr(e.message);
+      setBusy(false);
+    }
+  }
+  return (
+    <div className="v-paychoice">
+      <button className={className} onClick={go} disabled={busy}>{busy ? t.apply.payStarting : label}</button>
+      <div className="v-paynote">{t.apply.payCardNote}</div>
+      {err && <p className="v-err">{err}</p>}
+    </div>
+  );
+}
+
 /* ---------------- qualify ---------------- */
 function Qualify({ go, t, lang }) {
   const QUALIFY = t.qualify;
@@ -253,6 +278,12 @@ function Consult({ lic, screening, go, t, lang, onBooked }) {
       <div className="v-page v-narrow">
         <div className="v-lightbadge" style={{ color: GREEN, borderColor: GREEN }}>{t.apply.consultSentEyebrow}</div>
         <h1 className="v-h1 v-h1sm">{t.apply.bookedH1}</h1>
+        {booked.cardEnabled && (
+          <>
+            <PayCard clientId={booked.id} kind="consult" label={t.apply.payCard} t={t} />
+            <div className="v-paysep">{t.apply.orZelle}</div>
+          </>
+        )}
         <div className="v-zellecard">
           <div className="v-zellehead">{t.apply.zelleHead}</div>
           <div className="v-zellerow"><span>{t.apply.zelleTo}</span><strong>{ZELLE_TO}</strong></div>
@@ -264,7 +295,7 @@ function Consult({ lic, screening, go, t, lang, onBooked }) {
         {BOOKING_URL && (
           <a className="v-gold v-w100" href={BOOKING_URL} target="_blank" rel="noopener noreferrer">{t.apply.schedulerCta}</a>
         )}
-        <a className={(BOOKING_URL ? "v-quiet v-mt" : "v-gold") + " v-w100"} href={PHONE_TEL}>{t.apply.consultCallNow} · {PHONE}</a>
+        <a className={(BOOKING_URL || booked.cardEnabled ? "v-quiet v-mt" : "v-gold") + " v-w100"} href={PHONE_TEL}>{t.apply.consultCallNow} · {PHONE}</a>
         <p className="v-legal v-mt">{t.apply.consultLegal}</p>
       </div>
     );
@@ -342,7 +373,7 @@ function Consult({ lic, screening, go, t, lang, onBooked }) {
 }
 
 /* ---------------- portal ---------------- */
-function Portal({ clientId, t }) {
+function Portal({ clientId, paidSession, t }) {
   const PHASES = t.phases;
   const [c, setC] = useState(null);
   const [err, setErr] = useState("");
@@ -351,12 +382,23 @@ function Portal({ clientId, t }) {
   const [pendingItem, setPendingItem] = useState(null);
   const [busy, setBusy] = useState(false);
 
+  const [justPaid, setJustPaid] = useState(false);
+
   useEffect(() => {
-    fetch("/api/client?id=" + encodeURIComponent(clientId))
+    const load = () => fetch("/api/client?id=" + encodeURIComponent(clientId))
       .then((r) => r.json())
       .then((d) => (d.error ? setLoadFailed(true) : setC(d)))
       .catch(() => setLoadFailed(true));
-  }, [clientId]);
+    if (paidSession) {
+      fetch("/api/pay?session=" + encodeURIComponent(paidSession))
+        .then((r) => r.json())
+        .then((d) => { if (d.ok) setJustPaid(true); })
+        .catch(() => {})
+        .finally(load);
+    } else {
+      load();
+    }
+  }, [clientId, paidSession]);
 
   if (loadFailed) return (
     <div className="v-page v-narrow">
@@ -379,7 +421,14 @@ function Portal({ clientId, t }) {
             ? <span style={{ color: GREEN }}>{t.apply.portalConsultPaid}</span>
             : <span style={{ color: AMBER }}>{t.apply.portalConsultPending}</span>}
         </div>
+        {justPaid && <div className="v-notice">{t.apply.paidNotice}</div>}
         <p className="v-lede v-ledesm">{t.apply.portalPendingBody}</p>
+        {!c.consultPaid && c.cardEnabled && (
+          <>
+            <PayCard clientId={c.id} kind="consult" label={t.apply.payCard} t={t} />
+            <div className="v-paysep">{t.apply.orZelle}</div>
+          </>
+        )}
         {!c.consultPaid && (
           <div className="v-zellecard">
             <div className="v-zellehead">{t.apply.zelleHead}</div>
@@ -451,6 +500,25 @@ function Portal({ clientId, t }) {
           ? <span style={{ color: GREEN }}>{t.apply.portalPaid}</span>
           : <span style={{ color: AMBER }}>{t.apply.portalPending}</span>}
       </div>
+
+      {justPaid && <div className="v-notice">{t.apply.paidNotice}</div>}
+
+      {c.balanceDue > 0 && (
+        <div className="v-balance">
+          <div>
+            <div className="v-balancelabel">{t.apply.balanceLabel}</div>
+            <div className="v-balanceamt">{money(c.balanceDue)}</div>
+            <div className="v-mutetext" style={{ margin: "8px 0 0" }}>
+              {t.apply.balanceZelle} {ZELLE_TO} · {t.apply.balanceMemo} {c.ref}
+            </div>
+          </div>
+          {c.cardEnabled && (
+            <div style={{ minWidth: 260 }}>
+              <PayCard clientId={c.id} kind="balance" label={t.apply.payBalanceCard} t={t} />
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="v-progressblock">
         <div className="v-progresslabel">
@@ -590,7 +658,7 @@ export default function Flow({ t, lang = "en" }) {
       {view === "packages" && <Packages go={go} pickLicense={pickLicense} t={t} />}
       {view === "consult" && <Consult lic={lic} screening={screening} go={go} t={t} lang={lang} onBooked={setClientId} />}
       {view === "portal" && (clientId
-        ? <Portal clientId={clientId} t={t} />
+        ? <Portal clientId={clientId} paidSession={params.get("paid")} t={t} />
         : <Packages go={go} pickLicense={pickLicense} t={t} />)}
     </>
   );

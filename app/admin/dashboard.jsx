@@ -132,6 +132,12 @@ function ClientCard({ c, phases, appStatus, engagements, save }) {
         <label className="a-check"><input type="checkbox" checked={!!c.consultDone} onChange={(e) => save({ consultDone: e.target.checked })} /> Consultation held</label>
       </div>
 
+      {c.payments?.length > 0 && (
+        <div className="a-meta">
+          {c.payments.map((p) => <span key={p.session} className="a-paid">Card · {fmt(p.amount)} · {p.kind === "consult" ? "consultation" : "retainer"} · {when(p.at)}</span>)}
+        </div>
+      )}
+
       {!c.portalOpen && <QuoteBox c={c} engagements={engagements} save={save} />}
 
       {c.portalOpen && (

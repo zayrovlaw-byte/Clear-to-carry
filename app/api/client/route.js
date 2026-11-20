@@ -4,6 +4,7 @@ import { notifyOffice, emailClient } from "@/lib/mail";
 import { emails } from "@/lib/emails";
 import { getDict, isLocale } from "@/lib/i18n";
 import { CONSULT_FEE, money } from "@/lib/content";
+import { cardEnabled, amountDue } from "@/lib/stripe";
 
 const clean = (v, n) => String(v || "").slice(0, n).trim();
 
@@ -53,9 +54,9 @@ export async function POST(req) {
         `Dashboard: ${siteUrl()}/admin`,
       email
     );
-    const m = emails(lang).consultBooked(client, link);
+    const m = emails(lang).consultBooked(client, link, cardEnabled());
     await emailClient(email, m.subject, m.text, lang);
-    return NextResponse.json({ id: client.id, ref: client.ref });
+    return NextResponse.json({ id: client.id, ref: client.ref, cardEnabled: cardEnabled() });
   } catch (e) {
     console.error(e);
     return NextResponse.json({ error: "Something went wrong. Please call us." }, { status: 500 });
@@ -66,7 +67,7 @@ export async function GET(req) {
   const id = new URL(req.url).searchParams.get("id");
   const client = await getClient(id);
   if (!client) return NextResponse.json({ error: "notfound" }, { status: 404 });
-  return NextResponse.json(publicClient(client));
+  return NextResponse.json({ ...publicClient(client), cardEnabled: cardEnabled(), balanceDue: amountDue(client, "balance") });
 }
 
 /* The client may only open the next step once every item in the current one
@@ -87,7 +88,7 @@ export async function PATCH(req) {
       `${client.name} completed ${phase.name}`,
       `${client.name} (${client.ref}) sent everything for ${phase.name} and opened the next step. Review the documents in the dashboard.`
     );
-    return NextResponse.json(publicClient(updated));
+    return NextResponse.json({ ...publicClient(updated), cardEnabled: cardEnabled(), balanceDue: amountDue(updated, "balance") });
   } catch (e) {
     console.error(e);
     return NextResponse.json({ error: "Something went wrong." }, { status: 500 });

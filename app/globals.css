@@ -430,3 +430,15 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 
 /* Serif figures: lining numerals so 0 and 1 never read as letters. */
 .v-price, .v-feeamt, .v-packprice, .v-stepnum, .v-clockdays, .a-stats b, .v-h1, .v-h2 { font-variant-numeric: lining-nums; font-feature-settings: "lnum" 1; }
+.a-paid { display: inline-block; margin: 8px 8px 0 0; padding: 4px 8px; border: 1px solid rgba(127,181,146,.45); color: var(--ok); font-size: 12px; }
+
+/* card / Zelle choice */
+.v-paychoice { display: grid; gap: 10px; margin: 6px 0 22px; }
+.v-paycard { min-height: 56px; font-size: 13px; }
+.v-paynote { text-align: center; color: var(--muted); font-size: 12.5px; }
+.v-paysep { display: flex; align-items: center; gap: 14px; color: var(--dim); font-size: 11px; letter-spacing: .22em; text-transform: uppercase; margin: 10px 0 0; }
+.v-paysep::before, .v-paysep::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+.v-balance { display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap; border: 1px solid rgba(201,169,106,.35); background: var(--gold-wash); padding: 22px 26px; margin-bottom: 28px; }
+.v-balancelabel { font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--gold); margin-bottom: 4px; }
+.v-balanceamt { font: 400 36px/1 var(--serif); color: var(--gold-2); font-variant-numeric: lining-nums; }
+.v-notice { border-left: 2px solid var(--ok); padding: 6px 0 6px 16px; color: var(--text-2); margin-bottom: 24px; }

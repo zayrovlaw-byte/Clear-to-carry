@@ -6,6 +6,7 @@ import {
 import { emailClient } from "@/lib/mail";
 import { emails } from "@/lib/emails";
 import { getDict } from "@/lib/i18n";
+import { cardEnabled } from "@/lib/stripe";
 
 /* NOTE: this folder is named "data". The repo's .gitignore ignores only the
    top-level /data storage folder, so this route is committed. */
@@ -69,7 +70,7 @@ export async function PATCH(req) {
       p.packageName = name;
       p.retainedAt = new Date().toISOString();
       p.phase = before.phase || 1;
-      after.push((c) => E.quote(c, portalLink(c)));
+      after.push((c) => E.quote(c, portalLink(c), cardEnabled()));
     }
     if ("paymentVerified" in patch) {
       p.paymentVerified = !!patch.paymentVerified;
