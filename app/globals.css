@@ -442,3 +442,50 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .v-balancelabel { font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--gold); margin-bottom: 4px; }
 .v-balanceamt { font: 400 36px/1 var(--serif); color: var(--gold-2); font-variant-numeric: lining-nums; }
 .v-notice { border-left: 2px solid var(--ok); padding: 6px 0 6px 16px; color: var(--text-2); margin-bottom: 24px; }
+
+/* ---------- the 2 behind TO ---------- */
+.b-towrap { position: relative; display: inline-block; isolation: isolate; margin: 0 .08em; }
+.b-two {
+  position: absolute; left: 50%; top: 50%; z-index: -1; transform: translate(-50%, -53%);
+  font: 500 3.3em/1 var(--serif); letter-spacing: 0; color: var(--gold); opacity: .17;
+  pointer-events: none; user-select: none;
+}
+.b-navwords .b-two { opacity: .15; }
+.v-wordmark .b-two { font-size: 3em; }
+
+/* ---------- landing hero: framed like an engraved document ---------- */
+.v-herolanding {
+  min-height: calc(100vh - 66px); display: flex; flex-direction: column; justify-content: space-between;
+  padding-bottom: 0; margin: 18px; border: 1px solid var(--line);
+  background:
+    radial-gradient(55% 45% at 50% 22%, rgba(201,169,106,.09), transparent 70%),
+    repeating-linear-gradient(0deg, rgba(236,233,226,.012) 0 1px, transparent 1px 3px),
+    var(--bg);
+}
+.v-herolanding .v-heroinner { margin: auto; padding-top: clamp(30px, 6vh, 70px); }
+.v-herolanding .b-lock { margin-bottom: clamp(36px, 6vh, 60px); }
+.v-corner { position: absolute; width: 34px; height: 34px; border-color: var(--gold); border-style: solid; opacity: .7; }
+.v-corner--tl { top: 14px; left: 14px; border-width: 1px 0 0 1px; }
+.v-corner--tr { top: 14px; right: 14px; border-width: 1px 1px 0 0; }
+.v-corner--bl { bottom: 14px; left: 14px; border-width: 0 0 1px 1px; }
+.v-corner--br { bottom: 14px; right: 14px; border-width: 0 1px 1px 0; }
+.v-amendband { margin-top: clamp(50px, 8vh, 90px); padding: 34px clamp(24px, 6vw, 80px) 44px; border-top: 1px solid var(--line); text-align: center; }
+.v-amendlabel { font-size: 10.5px; letter-spacing: .3em; text-transform: uppercase; color: var(--gold); margin-bottom: 14px; }
+.v-amendfull {
+  font: 500 clamp(12px, 1.25vw, 15px)/1.9 var(--serif); letter-spacing: .2em; text-transform: uppercase;
+  color: var(--text-2); max-width: 1000px; margin: 0 auto;
+}
+.v-amendband .v-amendnote { margin-top: 12px; font-size: 13.5px; color: var(--muted); }
+@media (max-width: 760px) {
+  .v-herolanding { margin: 10px; min-height: auto; }
+  .v-corner { width: 22px; height: 22px; }
+  .v-amendfull { letter-spacing: .12em; }
+}
+.v-herolanding { padding-top: 34px; }
+.v-herolanding .v-heroinner { padding-top: 20px; }
+.v-herolanding .v-h1 { font-size: clamp(40px, 5.6vw, 70px); }
+.v-herolanding .v-amendband { margin-top: clamp(36px, 5vh, 60px); padding-top: 26px; padding-bottom: 34px; }
+@media (max-width: 760px) {
+  .v-hero .b-words { font-size: clamp(19px, 6.4vw, 28px) !important; letter-spacing: .2em; padding-left: .2em; }
+  .v-hero .b-tag { letter-spacing: .24em; }
+}

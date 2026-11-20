@@ -3,6 +3,16 @@ import { PHONE, PHONE_TEL, BOOKING_URL } from "@/lib/content";
 import { getDict, lp } from "@/lib/i18n";
 import LangSwitch from "@/lib/langswitch";
 
+/* "TO" with a gold 2 imprinted behind it: the Second Amendment, quietly. */
+export function To() {
+  return (
+    <span className="b-towrap">
+      <span className="b-two" aria-hidden="true">2</span>
+      <span className="b-to">TO</span>
+    </span>
+  );
+}
+
 /* ---- Brand: CLEAR TO CARRY over a ghosted 2, underlined.
    This lockup is the only mark. There is no separate crest. ---- */
 export function Wordmark({ size = 1, tagline = true, ghost = false, lang = "en" }) {
@@ -15,7 +25,7 @@ export function Wordmark({ size = 1, tagline = true, ghost = false, lang = "en" 
       )}
       <div className="b-front">
         <div className="b-words" style={{ fontSize: 29 * s }}>
-          CLEAR <span className="b-to">TO</span> CARRY
+          CLEAR <To /> CARRY
         </div>
         <div className="b-rule" style={{ margin: `${8 * s}px auto ${tagline ? 7 * s : 0}px` }} />
         {tagline && (
@@ -256,7 +266,7 @@ export function Nav({ lang = "en" }) {
       <div className="v-navin">
         <Link href={lp(lang, "/")} style={{ textDecoration: "none" }}>
           <div className="b-navlock">
-            <div className="b-words b-navwords">CLEAR <span className="b-to">TO</span> CARRY</div>
+            <div className="b-words b-navwords">CLEAR <To /> CARRY</div>
             <div className="b-rule b-navrule" />
           </div>
         </Link>

@@ -27,7 +27,7 @@ function Login({ onIn }) {
   }
   return (
     <form className="a-login" onSubmit={go}>
-      <div className="v-wordmark">CLEAR <span className="v-wordto">TO</span> CARRY</div>
+      <div className="v-wordmark">CLEAR <span className="b-towrap"><span className="b-two" aria-hidden="true">2</span><span className="v-wordto">TO</span></span> CARRY</div>
       <p className="v-mutetext">Attorney pipeline</p>
       <input className="v-input" type="password" autoFocus placeholder="Password" value={pw} onChange={(e) => setPw(e.target.value)} />
       {err && <p className="a-err">{err}</p>}

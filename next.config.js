@@ -20,6 +20,9 @@ const nextConfig = {
           { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
         ],
       },
+      // The attorney dashboard is never indexed or framed.
+      { source: "/admin", headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }, { key: "Cache-Control", value: "no-store" }] },
+      { source: "/api/admin/:path*", headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }, { key: "Cache-Control", value: "no-store" }] },
       // Client portal links carry the client's key in the URL; never leak it via Referer.
       { source: "/apply", headers: [{ key: "Referrer-Policy", value: "no-referrer" }] },
       { source: "/:lang(es|ru)/apply", headers: [{ key: "Referrer-Policy", value: "no-referrer" }] },

@@ -12,9 +12,13 @@ export default function Home({ lang = "en" }) {
       <HtmlLang lang={lang} />
       <Nav lang={lang} />
 
-      <section className="v-hero">
+      <section className="v-hero v-herolanding">
+        <span className="v-corner v-corner--tl" aria-hidden="true" />
+        <span className="v-corner v-corner--tr" aria-hidden="true" />
+        <span className="v-corner v-corner--bl" aria-hidden="true" />
+        <span className="v-corner v-corner--br" aria-hidden="true" />
         <div className="v-heroinner">
-          <Wordmark size={0.9} lang={lang} />
+          <Wordmark size={1.35} lang={lang} />
           <h1 className="v-h1">
             {h.heroH1a}
             <br />
@@ -27,15 +31,11 @@ export default function Home({ lang = "en" }) {
           </div>
           <div className="v-heronote">{h.heroNote}</div>
         </div>
-      </section>
-
-      <section className="v-amend" data-reveal>
-        <p className="v-amendquote">
-          {h.amendQuote}
-          <em>{h.amendQuoteEm}</em>
-        </p>
-        <div className="v-amendattr">{h.amendAttr}</div>
-        <div className="v-amendnote">{h.amendNote}</div>
+        <div className="v-amendband">
+          <div className="v-amendlabel">{h.amendLabel}</div>
+          <p className="v-amendfull">{h.amendFull}</p>
+          <div className="v-amendnote">{h.amendNote}</div>
+        </div>
       </section>
 
       <section className="v-section" data-reveal>
