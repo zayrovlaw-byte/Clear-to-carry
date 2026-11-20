@@ -46,16 +46,37 @@ require it to be held in the firm's IOLA/escrow account, and card processing fee
 cannot be taken out of client funds. Confirm how the firm treats these retainers
 before pointing card retainer payouts at an operating account.
 
-## Attorney dashboard: `/admin`
+## Firm dashboard: `/admin`
 
-Sign in with `ADMIN_PASSWORD`. Two tabs:
+For you and your staff only; clients never see it. It is not linked from the site,
+is excluded from search engines, and requires a staff login. Each person at the firm
+gets their own name and password (`ADMIN_USERS` in `.env.example`), and every action
+is recorded with who did it.
 
-- **Consultations & clients**: every booking, with screening answers, language, and
-  controls for consult payment, quote, engagement letter, retainer, step, filing,
-  status, outcome, uploaded documents, and private notes.
-- **Callbacks**: people who asked for a call instead of booking, with pipeline stages.
+- **Consultations & clients**: every booking, with screening answers, controls for
+  consult payment, quote, engagement letter, retainer, step, filing, status, outcome,
+  uploaded documents, private notes, reminders, and an **activity timeline** (bookings,
+  payments, uploads, every email sent, every staff change, with names and times).
+- **Callbacks**: people who asked for a call instead of booking.
 
-You get an email for every booking, callback and upload.
+You get an email for every booking, callback, card payment and upload.
+
+## Client emails and reminders
+
+Clients get an email when they book, when payment is received, when you quote, for
+**every document they upload** (with what is still needed), when a step opens, when
+the application is filed, and at each status change.
+
+Automatic reminders (`lib/reminders.js`), checked hourly and sent 9am–7pm New York time:
+
+| Reminder | First | Then every | At most |
+| --- | --- | --- | --- |
+| $159 consultation not paid | 24 hours after booking | 2 days | 2 |
+| Documents outstanding (lists what is missing) | 3 days after the last upload | 4 days | 4 |
+| Retainer balance unpaid | 3 days after the quote | 5 days | 3 |
+
+In the dashboard you can pause reminders for a client, send one immediately, or run
+the whole pass now. Every reminder appears in the client's activity timeline.
 
 ## Where to edit things
 
@@ -87,7 +108,7 @@ Clients upload documents, so the site needs a server with a disk. Vercel won't w
 
 ## Before launch
 
-1. Set `ADMIN_PASSWORD` (10+ characters), `SMTP_USER`, `SMTP_PASS` (a Google app
+1. Set `ADMIN_USERS` (a name and 10+ character password for each staff member), `SMTP_USER`, `SMTP_PASS` (a Google app
    password), `NOTIFY_EMAIL`, `NEXT_PUBLIC_ZELLE_TO`, `SITE_URL`, and the two Stripe keys.
 2. Book a test consultation yourself and check both emails arrive.
 3. Have a native speaker read the Spanish and Russian disclaimers and pricing text.

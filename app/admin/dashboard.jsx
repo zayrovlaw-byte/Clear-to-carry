@@ -16,23 +16,56 @@ async function api(method, body) {
 }
 
 function Login({ onIn }) {
+  const [name, setName] = useState("");
   const [pw, setPw] = useState("");
   const [err, setErr] = useState("");
   async function go(e) {
     e.preventDefault();
     setErr("");
-    const r = await fetch("/api/admin/login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ password: pw }) });
+    const r = await fetch("/api/admin/login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name, password: pw }) });
     const d = await r.json().catch(() => ({}));
-    if (r.ok) onIn(); else setErr(d.error || "Wrong password.");
+    if (r.ok) onIn(); else setErr(d.error || "Wrong name or password.");
   }
   return (
     <form className="a-login" onSubmit={go}>
       <div className="v-wordmark">CLEAR <span className="b-towrap"><span className="b-two" aria-hidden="true">2</span><span className="v-wordto">TO</span></span> CARRY</div>
-      <p className="v-mutetext">Attorney pipeline</p>
-      <input className="v-input" type="password" autoFocus placeholder="Password" value={pw} onChange={(e) => setPw(e.target.value)} />
+      <p className="v-mutetext">Zayrov Law, P.C. · firm staff only</p>
+      <input className="v-input" autoFocus placeholder="Name" autoComplete="username" value={name} onChange={(e) => setName(e.target.value)} />
+      <input className="v-input" type="password" placeholder="Password" autoComplete="current-password" value={pw} onChange={(e) => setPw(e.target.value)} />
       {err && <p className="a-err">{err}</p>}
       <button className="v-gold v-w100" type="submit">Sign in</button>
     </form>
+  );
+}
+
+function Activity({ log }) {
+  const [all, setAll] = useState(false);
+  if (!log?.length) return null;
+  const rows = [...log].reverse();
+  const shown = all ? rows : rows.slice(0, 5);
+  return (
+    <div className="a-activity">
+      <div className="a-activityhead">Activity</div>
+      {shown.map((e, i) => (
+        <div className="a-event" key={i}>
+          <span className="a-eventwhen">{when(e.at)}</span>
+          <span className="a-eventtext">{e.text}</span>
+          <span className="a-eventby">{e.by}</span>
+        </div>
+      ))}
+      {rows.length > 5 && <button className="a-more" onClick={() => setAll(!all)}>{all ? "Show less" : `Show all ${rows.length}`}</button>}
+    </div>
+  );
+}
+
+function Reminders({ c, save, remind }) {
+  const sent = Object.entries(c.reminders || {}).map(([k, v]) => `${k} ×${v.count}`).join(" · ");
+  return (
+    <div className="a-controls a-reminders">
+      <span className="a-hint">Reminders: {c.remindersPaused ? "paused" : c.reminderDue ? "next: " + c.reminderDue.toLowerCase() : "nothing due"}{sent ? " · sent " + sent : ""}</span>
+      <label className="a-check"><input type="checkbox" checked={!!c.remindersPaused} onChange={(e) => save({ remindersPaused: e.target.checked })} /> Pause reminders</label>
+      {c.reminderDue && !c.remindersPaused && <button className="v-quiet v-sm" onClick={() => remind(c.id)}>Send reminder now</button>}
+    </div>
   );
 }
 
@@ -103,7 +136,7 @@ function QuoteBox({ c, engagements, save }) {
   );
 }
 
-function ClientCard({ c, phases, appStatus, engagements, save }) {
+function ClientCard({ c, phases, appStatus, engagements, save, remind }) {
   const [copied, setCopied] = useState(false);
   const items = phases.flatMap((p) => p.items.map((i) => ({ ...i, phase: p.name })));
   return (
@@ -192,7 +225,9 @@ function ClientCard({ c, phases, appStatus, engagements, save }) {
           {copied ? "Copied" : "Copy client link"}
         </button>
       </div>
+      <Reminders c={c} save={save} remind={remind} />
       <Notes value={c.adminNotes} onSave={(adminNotes) => save({ adminNotes })} />
+      <Activity log={c.log} />
     </div>
   );
 }
@@ -226,6 +261,15 @@ export default function Dashboard() {
     }
   }
 
+  async function remind(id) {
+    setErr("");
+    const r = await fetch("/api/admin/reminders", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(id ? { id } : {}) });
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok) setErr(d.error || "Could not send.");
+    else if (!id) setErr(d.sent ? `Sent ${d.sent} reminder${d.sent > 1 ? "s" : ""}.` : "No reminders were due.");
+    await load();
+  }
+
   async function logout() {
     await fetch("/api/admin/login", { method: "DELETE" });
     setState("out");
@@ -252,6 +296,8 @@ export default function Dashboard() {
       <div className="a-top">
         <div className="v-wordmark">CLEAR <span className="v-wordto">TO</span> CARRY <span className="a-sub">Pipeline</span></div>
         <div className="a-row" style={{ gap: 10 }}>
+          <span className="a-hint">Signed in as {data.staff}</span>
+          <button className="v-quiet v-sm" onClick={() => remind()}>Run reminders now</button>
           <button className="v-quiet v-sm" onClick={load}>Refresh</button>
           <button className="v-quiet v-sm" onClick={logout}>Sign out</button>
         </div>
@@ -289,7 +335,7 @@ export default function Dashboard() {
       {tab === "clients" && (
         <>
           {clients.length === 0 && <p className="v-mutetext">No consultations booked yet.</p>}
-          {clients.map((c) => <ClientCard key={c.id} c={c} phases={phases} appStatus={appStatus} engagements={engagements} save={(p) => save("client", c.id, p)} />)}
+          {clients.map((c) => <ClientCard key={c.id} c={c} phases={phases} appStatus={appStatus} engagements={engagements} save={(p) => save("client", c.id, p)} remind={remind} />)}
         </>
       )}
     </div>

@@ -1,4 +1,4 @@
-import { LOCALES, DEFAULT_LOCALE, lp } from "@/lib/i18n";
+import { ACTIVE_LOCALES as LOCALES, DEFAULT_LOCALE, lp } from "@/lib/i18n";
 import { SITE } from "@/lib/meta";
 import { BLOG_META } from "@/lib/schema";
 

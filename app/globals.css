@@ -489,3 +489,15 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   .v-hero .b-words { font-size: clamp(19px, 6.4vw, 28px) !important; letter-spacing: .2em; padding-left: .2em; }
   .v-hero .b-tag { letter-spacing: .24em; }
 }
+
+/* dashboard: reminders + activity */
+.a-reminders { padding-top: 12px; border-top: 1px solid var(--line); }
+.a-activity { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); }
+.a-activityhead { font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+.a-event { display: grid; grid-template-columns: 120px 1fr auto; gap: 12px; font-size: 13px; padding: 5px 0; border-bottom: 1px dashed var(--line); }
+.a-eventwhen { color: var(--dim); }
+.a-eventtext { color: var(--text-2); }
+.a-eventby { color: var(--gold); font-size: 12px; }
+.a-more { margin-top: 8px; font-size: 12.5px; color: var(--gold); }
+.a-login .v-input { text-align: left; }
+@media (max-width: 760px) { .a-event { grid-template-columns: 1fr; gap: 2px; } }

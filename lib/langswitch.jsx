@@ -1,7 +1,7 @@
 "use client";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { LOCALES, DEFAULT_LOCALE, LOCALE_LABELS, isLocale } from "@/lib/i18n";
+import { ACTIVE_LOCALES as LOCALES, DEFAULT_LOCALE, LOCALE_LABELS, isLocale } from "@/lib/i18n";
 
 /* Swaps the locale prefix on the path the visitor is already reading, so
    switching language keeps them on the same page rather than dumping them
@@ -12,6 +12,7 @@ export default function LangSwitch({ lang = "en", label = "Language" }) {
   const bare = isLocale(parts[0]) ? "/" + parts.slice(1).join("/") : pathname;
   const clean = bare === "/" || bare === "" ? "" : bare.replace(/\/$/, "");
 
+  if (LOCALES.length < 2) return null;
   return (
     <div className="v-langs" role="group" aria-label={label}>
       {LOCALES.map((code) => {

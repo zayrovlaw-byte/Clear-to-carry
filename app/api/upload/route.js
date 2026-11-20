@@ -2,7 +2,9 @@ import { NextResponse } from "next/server";
 import { promises as fs } from "fs";
 import path from "path";
 import crypto from "crypto";
-import { getClient, updateClient, publicClient, UPLOAD_DIR } from "@/lib/db";
+import { getClient, updateClient, publicClient, UPLOAD_DIR, addLog, portalLink } from "@/lib/db";
+import { mailClient } from "@/lib/clientmail";
+import { emails } from "@/lib/emails";
 import { notifyOffice } from "@/lib/mail";
 import { getDict } from "@/lib/i18n";
 
@@ -43,6 +45,13 @@ export async function POST(req) {
         [itemId]: { name: safeName, size: file.size, at: new Date().toISOString(), stored, status: "received" },
       },
     }));
+    const replaced = !!client.docs?.[itemId];
+    await addLog(client.id, `${replaced ? "Replaced" : "Uploaded"}: ${ITEMS.get(itemId)} (${safeName})`, "Client");
+    const t = getDict(client.lang || "en");
+    const step = t.phases.find((p) => p.items.some((i) => i.id === itemId));
+    const label = step.items.find((i) => i.id === itemId).label.split(" · ")[0];
+    const left = step.items.filter((i) => !updated.docs?.[i.id]).map((i) => i.label.split(" · ")[0]);
+    await mailClient(updated, emails(client.lang).uploadReceived(updated, label, left, step.name, portalLink(updated)));
     await notifyOffice(
       `Upload from ${client.name}: ${ITEMS.get(itemId)}`,
       `Client: ${client.name} (${client.ref})\nItem: ${ITEMS.get(itemId)}\nFile: ${safeName} (${Math.round(file.size / 1024)} KB)\n\nOpen it in the dashboard: ${process.env.SITE_URL || "https://cleartocarrynyc.com"}/admin`

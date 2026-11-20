@@ -6,6 +6,9 @@ const nextConfig = {
       { source: "/bruen", destination: "/your-rights", permanent: true },
       { source: "/reviews", destination: "/", permanent: false },
       { source: "/:lang(es|ru)/reviews", destination: "/:lang", permanent: false },
+      // Spanish and Russian are switched off for now (see ACTIVE_LOCALES in lib/i18n.js).
+      { source: "/:lang(es|ru)", destination: "/", permanent: false },
+      { source: "/:lang(es|ru)/:path*", destination: "/:path*", permanent: false },
     ];
   },
   async headers() {

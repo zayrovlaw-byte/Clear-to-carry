@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
-import { addClient, getClient, updateClient, publicClient, portalLink, siteUrl } from "@/lib/db";
-import { notifyOffice, emailClient } from "@/lib/mail";
+import { addClient, getClient, updateClient, publicClient, portalLink, siteUrl, addLog } from "@/lib/db";
+import { mailClient } from "@/lib/clientmail";
+import { notifyOffice } from "@/lib/mail";
 import { emails } from "@/lib/emails";
 import { getDict, isLocale } from "@/lib/i18n";
 import { CONSULT_FEE, money } from "@/lib/content";
@@ -54,8 +55,8 @@ export async function POST(req) {
         `Dashboard: ${siteUrl()}/admin`,
       email
     );
-    const m = emails(lang).consultBooked(client, link, cardEnabled());
-    await emailClient(email, m.subject, m.text, lang);
+    await addLog(client.id, "Booked a consultation online" + (client.light ? ` (screening: ${client.light})` : ""), "Client");
+    await mailClient(client, emails(lang).consultBooked(client, link, cardEnabled()));
     return NextResponse.json({ id: client.id, ref: client.ref, cardEnabled: cardEnabled() });
   } catch (e) {
     console.error(e);
@@ -83,7 +84,8 @@ export async function PATCH(req) {
     if (!client.portalOpen || body.advance !== true || !complete || client.phase >= phases.length) {
       return NextResponse.json({ error: "This step isn't complete yet." }, { status: 400 });
     }
-    const updated = await updateClient(client.id, { phase: client.phase + 1 });
+    await updateClient(client.id, { phase: client.phase + 1 });
+    const updated = await addLog(client.id, `Completed ${phase.name} and opened the next step`, "Client");
     await notifyOffice(
       `${client.name} completed ${phase.name}`,
       `${client.name} (${client.ref}) sent everything for ${phase.name} and opened the next step. Review the documents in the dashboard.`
